@@ -118,7 +118,7 @@
     "containerName": "vhds",
     "vnetID": "[resourceId(parameters('Virtual_Network_Resource_Group'), 'Microsoft.Network/virtualNetworks', parameters('Virtual_Network'))]",
     "subnetRef": "[concat(variables('vnetID'),'/subnets/',parameters('Subnet'))]",
-    "scriptFileUrl": "https://raw.githubusercontent.com/Unidesk/azure-templates/master/SetupFileShare.ps1",
+    "scriptFileUrl": "https://unideskintegrationtest.blob.core.windows.net/resources-do-not-delete/SetupFileShare.ps1",
     "scriptFileName": "SetupFileShare.ps1"
   },
   "resources": [
