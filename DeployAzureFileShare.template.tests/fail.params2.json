@@ -1,0 +1,42 @@
+{
+  "$schema": "http://schema.management.azure.com/schemas/2015-01-01/deploymentParameters.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+    "Virtual_Machine_Name": {
+      "value": "TestVmName1236767"
+    },
+    "Virtual_Machine_Size": {
+      "value": "Standard_A2"
+    },
+    "Data_Disks": {
+      "value": 1
+    },
+    "Data_Disk_Size_GB": {
+      "value": 512
+    },
+    "Data_Disk_Host_Caching": {
+      "value": "ReadOnly"
+    },
+    "Ip_Address_Type": {
+      "value": "Dynamic"
+    },
+    "Ip_Address": {
+      "value": ""
+    },
+    "Admin_Username": {
+      "value": "Blarghah"
+    },
+    "Admin_Password": {
+      "value": "Blarghaha1"
+    },
+    "Virtual_Network": {
+      "value": "Unidesk-ARM-Site-to-Site"
+    },
+    "Virtual_Network_Resource_Group": {
+      "value": "something-else"
+    },
+    "Subnet": {
+      "value": "default"
+    }
+  }
+}

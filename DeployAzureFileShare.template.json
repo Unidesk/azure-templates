@@ -1,0 +1,220 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+    "Virtual_Machine_Name": {
+      "type": "string",
+      "minLength": 3,
+      "maxLength": 24,
+      "metadata": {
+        "description": "Name of your virtual machine. This will also be used to name all other resources that get created."
+      }
+    },
+    "Virtual_Machine_Size": {
+      "type": "string",
+      "allowedValues": [
+        "Standard_DS1",
+        "Standard_DS2",
+        "Standard_DS3",
+        "Standard_DS4",
+        "Standard_DS11",
+        "Standard_DS12",
+        "Standard_DS13",
+        "Standard_DS14",
+        "Standard_GS1",
+        "Standard_GS2",
+        "Standard_GS3",
+        "Standard_GS4",
+        "Standard_GS5"
+      ],
+      "metadata": {
+        "description": "Size of the virtual machine. Visit here for information about each size: https://azure.microsoft.com/en-us/documentation/articles/virtual-machines-size-specs/#standard-tier-d-series"
+      }
+    },
+    "Data_Disks": {
+      "type": "int",
+      "defaultValue": 1,
+      "allowedValues": [1],
+      "metadata": {
+        "description": "Number of data disks (SSDs) to attach to the machine. To change this number, you must use a different template."
+      }
+    },
+    "Data_Disk_Size_GB": {
+      "type": "int",
+      "defaultValue": 512,
+      "allowedValues": [
+        128,
+        512,
+        1023
+      ],
+      "metadata": {
+        "description": "Capacity of each data disk in GB. Higher capacity disks are also faster, but cost significantly more. Visit here for information about each size: https://azure.microsoft.com/en-us/documentation/articles/storage-premium-storage-preview-portal/#scalability-and-performance-targets-when-using-premium-storage"
+      }
+    },
+    "Data_Disk_Host_Caching": {
+      "type": "string",
+      "defaultValue": "ReadOnly",
+      "allowedValues": [
+        "ReadWrite",
+        "ReadOnly",
+        "None"
+      ],
+      "metadata": {
+        "description": "Caching policy to use for each disk. Microsoft recommends ReadOnly. Visit here for more information about each option: https://azure.microsoft.com/en-us/documentation/articles/storage-premium-storage-preview-portal/#using-premium-storage-for-disks"
+      }
+    },
+    "Ip_Address_Type": {
+      "type": "string",
+      "defaultValue": "Dynamic",
+      "allowedValues": [
+        "Dynamic",
+        "Static"
+      ],
+      "metadata": {
+        "description": "Allocation method for the virtual machine's IP address."
+      }
+    },
+    "Ip_Address": {
+      "type": "string",
+      "minLength": 0,
+      "metadata": {
+        "description": "The static IP address of the virtual machine. If using Dynamic allocation, this field is ignored and should be left blank. This IP address must reside in the virtual network's subnet."
+      }
+    },
+    "Admin_Username": {
+      "type": "string",
+      "minLength": 3,
+      "maxLength": 20,
+      "metadata": {
+        "description": "Username of the administrator account that will be created on the virtual machine."
+      }
+    },
+    "Admin_Password": {
+      "type": "securestring",
+      "minLength": 8,
+      "maxLength": 127,
+      "metadata": {
+        "description": "Password of the administrator account on the virtual machine."
+      }
+    },
+    "Virtual_Network": {
+      "type": "string",
+      "defaultValue": "unidesk-arm-nov11-eastus",
+      "metadata": {
+        "description": "Virtual network to deploy the virtual machine in."
+      }
+    },
+    "Virtual_Network_Resource_Group": {
+      "type": "string",
+      "defaultValue": "unidesk-arm-nov11-eastus-group",
+      "metadata": {
+        "description": "Resource group of the virtual network."
+      }
+    },
+    "Subnet": {
+      "type": "string",
+      "defaultValue": "default",
+      "metadata": {
+        "description": "Virtual network subnet to deploy the virtual machine in."
+      }
+    }
+  },
+  "variables": {
+    "windowsOSVersion": "2012-R2-Datacenter",
+    "imagePublisher": "MicrosoftWindowsServer",
+    "imageOffer": "WindowsServer",
+    "osDiskName": "[concat(parameters('Virtual_Machine_Name'),'-OSDisk')]",
+    "dataDiskPrefix": "[concat(parameters('Virtual_Machine_Name'),'-DataDisk-')]",
+    "nicName": "[concat(parameters('Virtual_Machine_Name'),'-NIC')]",
+    "storageAccountName": "[concat(replace(parameters('Virtual_Machine_Name'), '-', ''), 'udstorage')]",
+    "containerName": "vhds",
+    "vnetID": "[resourceId(parameters('Virtual_Network_Resource_Group'), 'Microsoft.Network/virtualNetworks', parameters('Virtual_Network'))]",
+    "subnetRef": "[concat(variables('vnetID'),'/subnets/',parameters('Subnet'))]"
+  },
+  "resources": [
+    {
+      "apiVersion": "2015-05-01-preview",
+      "type": "Microsoft.Storage/storageAccounts",
+      "name": "[variables('storageAccountName')]",
+      "location": "[resourceGroup().location]",
+      "properties": {
+        "accountType": "Premium_LRS"
+      }
+    },
+    {
+      "apiVersion": "2015-05-01-preview",
+      "type": "Microsoft.Network/networkInterfaces",
+      "name": "[variables('nicName')]",
+      "location": "[resourceGroup().location]",
+      "properties": {
+        "ipConfigurations": [
+          {
+            "name": "ipconfig1",
+            "properties": {
+              "privateIPAllocationMethod": "[parameters('Ip_Address_Type')]",
+              "privateIPAddress": "[parameters('Ip_Address')]",
+              "subnet": {
+                "id": "[variables('subnetRef')]"
+              }
+            }
+          }
+        ]
+      }
+    },
+    {
+      "apiVersion": "2015-06-15",
+      "type": "Microsoft.Compute/virtualMachines",
+      "name": "[parameters('Virtual_Machine_Name')]",
+      "location": "[resourceGroup().location]",
+      "dependsOn": [
+        "[concat('Microsoft.Network/networkInterfaces/', variables('nicName'))]",
+        "[concat('Microsoft.Storage/storageAccounts/', variables('storageAccountName'))]"
+      ],
+      "properties": {
+        "hardwareProfile": {
+          "vmSize": "[parameters('Virtual_Machine_Size')]"
+        },
+        "osProfile": {
+          "computername": "[parameters('Virtual_Machine_Name')]",
+          "adminUsername": "[parameters('Admin_Username')]",
+          "adminPassword": "[parameters('Admin_Password')]"
+        },
+        "storageProfile": {
+          "imageReference": {
+            "publisher": "[variables('imagePublisher')]",
+            "offer": "[variables('imageOffer')]",
+            "sku": "[variables('windowsOSVersion')]",
+            "version": "latest"
+          },
+          "osDisk": {
+            "name": "[variables('osDiskName')]",
+            "vhd": {
+              "uri": "[concat('https://',variables('storageAccountName'),'.blob.core.windows.net/',variables('containerName'),'/',variables('osDiskName'),'.vhd')]"
+            },
+            "caching": "ReadWrite",
+            "createOption": "FromImage"
+          },
+          "dataDisks": [
+            {
+              "name": "[concat(variables('dataDiskPrefix'), '0')]",
+              "diskSizeGB": "[parameters('Data_Disk_Size_GB')]",
+              "lun": "0",
+              "vhd": {
+                "uri": "[concat('https://', variables('storageAccountName'), '.blob.core.windows.net/', variables('containerName'), '/', variables('dataDiskPrefix'), '0.vhd')]"
+              },
+              "createOption": "Empty",
+              "caching": "[parameters('Data_Disk_Host_Caching')]"
+            }
+          ]
+        },
+        "networkProfile": {
+          "networkInterfaces": [
+            {
+              "id": "[resourceId('Microsoft.Network/networkInterfaces',variables('nicName'))]"
+            }
+          ]
+        }
+      }
+    }
+  ]
+}
