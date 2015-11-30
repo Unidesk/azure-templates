@@ -6,7 +6,7 @@
       "value": "TestVmName1236767"
     },
     "Virtual_Machine_Size": {
-      "value": "Standard_DS3"
+      "value": "Standard_DS1"
     },
     "Data_Disks": {
       "value": 1
@@ -16,9 +16,6 @@
     },
     "Data_Disk_Host_Caching": {
       "value": "ReadOnly"
-    },
-    "Ip_Address_Type": {
-      "value": "Static"
     },
     "Ip_Address": {
       "value": "10.8.0.198"

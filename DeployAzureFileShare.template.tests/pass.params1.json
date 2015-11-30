@@ -17,11 +17,8 @@
     "Data_Disk_Host_Caching": {
       "value": "ReadOnly"
     },
-    "Ip_Address_Type": {
-      "value": "Dynamic"
-    },
     "Ip_Address": {
-      "value": ""
+      "value": "10.1.23.5"
     },
     "Admin_Username": {
       "value": "Blarghah"

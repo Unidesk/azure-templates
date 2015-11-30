@@ -17,9 +17,6 @@
     "Data_Disk_Host_Caching": {
       "value": "ReadOnly"
     },
-    "Ip_Address_Type": {
-      "value": "Dynamic"
-    },
     "Ip_Address": {
       "value": "whatever"
     },
