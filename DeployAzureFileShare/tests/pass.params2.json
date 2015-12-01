@@ -6,16 +6,19 @@
       "value": "TestVmName1236767"
     },
     "Virtual_Machine_Size": {
-      "value": "Standard_DS3"
+      "value": "Basic_A2: 1000 cores, 100000 cpus, 121344 data disks"
     },
     "Data_Disks": {
-      "value": 1
+      "value": 64
     },
     "Data_Disk_Size_GB": {
-      "value": 512
+      "value": 123
     },
     "Data_Disk_Host_Caching": {
       "value": "ReadOnly"
+    },
+    "Storage_Account_Type": {
+      "value": "Standard_LRS"
     },
     "Ip_Address": {
       "value": "whatever"

@@ -3,108 +3,51 @@
   "contentVersion": "1.0.0.0",
   "parameters": {
     "Virtual_Machine_Name": {
-      "type": "string",
-      "minLength": 3,
-      "maxLength": 24,
-      "metadata": {
-        "description": "Name of your virtual machine. This will also be used to name all other resources that get created."
-      }
+      "type": "string"
     },
     "Virtual_Machine_Size": {
-      "type": "string",
-      "allowedValues": [
-        "Standard_DS1",
-        "Standard_DS2",
-        "Standard_DS3",
-        "Standard_DS4",
-        "Standard_DS11",
-        "Standard_DS12",
-        "Standard_DS13",
-        "Standard_DS14",
-        "Standard_GS1",
-        "Standard_GS2",
-        "Standard_GS3",
-        "Standard_GS4",
-        "Standard_GS5"
-      ],
-      "metadata": {
-        "description": "Size of the virtual machine. Visit here for information about each size: https://azure.microsoft.com/en-us/documentation/articles/virtual-machines-size-specs/#standard-tier-d-series"
-      }
+      "type": "string"
     },
     "Data_Disks": {
-      "type": "int",
-      "minValue": 1,
-      "maxValue": 8,
-      "metadata": {
-        "description": "Number of data disks (SSDs) to attach to the machine. The VM size you select MUST support this many disks, otherwise the deployment will fail. Visit here for information about each size: https://azure.microsoft.com/en-us/documentation/articles/virtual-machines-size-specs/#standard-tier-d-series"
-      }
+      "type": "int"
     },
     "Data_Disk_Size_GB": {
-      "type": "int",
-      "defaultValue": 512,
-      "allowedValues": [
-        128,
-        512,
-        1023
-      ],
-      "metadata": {
-        "description": "Capacity of each data disk in GB. Higher capacity disks are also faster, but cost significantly more. Visit here for information about each size: https://azure.microsoft.com/en-us/documentation/articles/storage-premium-storage-preview-portal/#scalability-and-performance-targets-when-using-premium-storage"
-      }
+      "type": "int"
     },
     "Data_Disk_Host_Caching": {
       "type": "string",
-      "defaultValue": "ReadOnly",
       "allowedValues": [
         "ReadWrite",
         "ReadOnly",
         "None"
-      ],
-      "metadata": {
-        "description": "Caching policy to use for each disk. Microsoft recommends ReadOnly. Visit here for more information about each option: https://azure.microsoft.com/en-us/documentation/articles/storage-premium-storage-preview-portal/#using-premium-storage-for-disks"
-      }
+      ]
+    },
+    "Storage_Account_Type": {
+      "type": "string",
+      "allowedValues": [
+        "Standard_LRS",
+        "Standard_GRS",
+        "Standard_RAGRS",
+        "Premium_LRS"
+      ]
     },
     "Ip_Address": {
-      "type": "string",
-      "metadata": {
-        "description": "The static IP address of the virtual machine. This IP address must reside in the virtual network's subnet."
-      }
+      "type": "string"
     },
     "Admin_Username": {
-      "type": "string",
-      "minLength": 3,
-      "maxLength": 20,
-      "metadata": {
-        "description": "Username of the administrator account that will be created on the virtual machine."
-      }
+      "type": "string"
     },
     "Admin_Password": {
-      "type": "securestring",
-      "minLength": 8,
-      "maxLength": 127,
-      "metadata": {
-        "description": "Password of the administrator account on the virtual machine."
-      }
+      "type": "securestring"
     },
     "Virtual_Network": {
-      "type": "string",
-      "defaultValue": "unidesk-arm-nov11-eastus",
-      "metadata": {
-        "description": "Virtual network to deploy the virtual machine in."
-      }
+      "type": "string"
     },
     "Virtual_Network_Resource_Group": {
-      "type": "string",
-      "defaultValue": "unidesk-arm-nov11-eastus-group",
-      "metadata": {
-        "description": "Resource group of the virtual network."
-      }
+      "type": "string"
     },
     "Subnet": {
-      "type": "string",
-      "defaultValue": "default",
-      "metadata": {
-        "description": "Virtual network subnet to deploy the virtual machine in."
-      }
+      "type": "string"
     }
   },
   "variables": {
@@ -123,7 +66,8 @@
     "scriptFileName": "SetupFileShare.ps1",
     "scriptFileUrl": "[concat('https://', variables('scriptStorageAccountName'), '.blob.core.windows.net/resources-do-not-delete/', variables('scriptFileName'))]",
     "scriptStorageAccountId": "[concat('/subscriptions/', subscription().subscriptionId, '/resourceGroups/', variables('scriptStorageResourceGroup'), '/providers/Microsoft.Storage/storageAccounts/', variables('scriptStorageAccountName'))]",
-    "vmTemplateUrlPrefix": "https://raw.githubusercontent.com/Unidesk/azure-templates/master/DeployAzureFileShare/subtemplates/DeployVmDisks"
+    "vmTemplateUrlPrefix": "https://raw.githubusercontent.com/Unidesk/azure-templates/master/DeployAzureFileShare/subtemplates/DeployVmDisks",
+    "vmSizeId": "[split(parameters('Virtual_Machine_Size'), ':')[0]]"
   },
   "resources": [
     {
@@ -132,7 +76,7 @@
       "name": "[variables('storageAccountName')]",
       "location": "[resourceGroup().location]",
       "properties": {
-        "accountType": "Premium_LRS"
+        "accountType": "[parameters('Storage_Account_Type')]"
       }
     },
     {
@@ -175,7 +119,7 @@
           },
           "Hardware_Profile": {
             "value": {
-              "vmSize": "[parameters('Virtual_Machine_Size')]"
+              "vmSize": "[variables('vmSizeId')]"
             },
           },
           "Os_Profile": {

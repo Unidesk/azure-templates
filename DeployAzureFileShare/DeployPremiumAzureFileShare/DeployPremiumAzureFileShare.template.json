@@ -1,0 +1,185 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+    "Virtual_Machine_Name": {
+      "type": "string",
+      "minLength": 3,
+      "maxLength": 24,
+      "metadata": {
+        "description": "Name of your virtual machine. This will also be used to name all other resources that get created."
+      }
+    },
+    "Virtual_Machine_Size": {
+      "type": "string",
+      "allowedValues": [
+        "Standard_DS1: 1 core, 3.5 GB RAM, 2 data disks",
+        "Standard_DS2: 2 cores, 7 GB RAM, 4 data disks",
+        "Standard_DS3: 4 cores, 14 GB RAM, 8 data disks",
+        "Standard_DS4: 8 cores, 28 GB RAM, 16 data disks",
+        "Standard_DS11: 2 cores, 14 GB RAM, 4 data disks",
+        "Standard_DS12: 4 cores, 28 GB RAM, 8 data disks",
+        "Standard_DS13: 8 cores, 56 GB RAM, 16 data disks",
+        "Standard_DS14: 16 cores, 112 GB RAM, 32 data disks",
+        "Standard_GS1: 2 cores, 28 GB RAM, 4 data disks",
+        "Standard_GS2: 4 cores, 56 GB RAM, 8 data disks",
+        "Standard_GS3: 8 cores, 112 GB RAM, 16 data disks",
+        "Standard_GS4: 16 cores, 224 GB RAM, 32 data disks",
+        "Standard_GS5: 32 cores, 448 GB RAM, 64 data disks"
+      ],
+      "metadata": {
+        "description": "Size of the virtual machine. Visit here for information about each size: https://azure.microsoft.com/en-us/documentation/articles/virtual-machines-size-specs/#standard-tier-d-series"
+      }
+    },
+    "Data_Disks": {
+      "type": "int",
+      "allowedValues": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        12,
+        16,
+        24,
+        32,
+        48,
+        64
+      ],
+      "metadata": {
+        "description": "Number of data disks (SSDs) to attach to the machine. The VM size you select MUST support this many disks, otherwise the deployment will fail. Visit here for information about each size: https://azure.microsoft.com/en-us/documentation/articles/virtual-machines-size-specs/#standard-tier-d-series"
+      }
+    },
+    "Data_Disk_Size_GB": {
+      "type": "int",
+      "defaultValue": 512,
+      "allowedValues": [
+        128,
+        512,
+        1023
+      ],
+      "metadata": {
+        "description": "Capacity of each data disk in GB. Higher capacity disks are also faster, but cost significantly more. Visit here for information about each size: https://azure.microsoft.com/en-us/documentation/articles/storage-premium-storage-preview-portal/#scalability-and-performance-targets-when-using-premium-storage"
+      }
+    },
+    "Data_Disk_Host_Caching": {
+      "type": "string",
+      "defaultValue": "ReadOnly",
+      "allowedValues": [
+        "ReadWrite",
+        "ReadOnly",
+        "None"
+      ],
+      "metadata": {
+        "description": "Caching policy to use for each disk. Microsoft recommends ReadOnly. Visit here for more information about each option: https://azure.microsoft.com/en-us/documentation/articles/storage-premium-storage-preview-portal/#using-premium-storage-for-disks"
+      }
+    },
+    "Ip_Address": {
+      "type": "string",
+      "metadata": {
+        "description": "The static IP address of the virtual machine. This IP address must reside in the virtual network's subnet."
+      }
+    },
+    "Admin_Username": {
+      "type": "string",
+      "minLength": 3,
+      "maxLength": 20,
+      "metadata": {
+        "description": "Username of the administrator account that will be created on the virtual machine."
+      }
+    },
+    "Admin_Password": {
+      "type": "securestring",
+      "minLength": 8,
+      "maxLength": 127,
+      "metadata": {
+        "description": "Password of the administrator account on the virtual machine."
+      }
+    },
+    "Virtual_Network": {
+      "type": "string",
+      "defaultValue": "unidesk-arm-nov11-eastus",
+      "metadata": {
+        "description": "Virtual network to deploy the virtual machine in."
+      }
+    },
+    "Virtual_Network_Resource_Group": {
+      "type": "string",
+      "defaultValue": "unidesk-arm-nov11-eastus-group",
+      "metadata": {
+        "description": "Resource group of the virtual network."
+      }
+    },
+    "Subnet": {
+      "type": "string",
+      "defaultValue": "default",
+      "metadata": {
+        "description": "Virtual network subnet to deploy the virtual machine in."
+      }
+    }
+  },
+  "variables": {
+    "fileShareTemplateUrl": "https://raw.githubusercontent.com/Unidesk/azure-templates/master/DeployAzureFileShare/DeployAzureFileShare.template.json"
+  },
+  "resources": [
+    {
+      "apiVersion": "2015-01-01",
+      "type": "Microsoft.Resources/deployments",
+      "name": "file-share-deployment",
+      "properties": {
+        "mode": "Incremental",
+        "templateLink": {
+          "uri": "[variables('fileShareTemplateUrl')]",
+          "contentVersion": "1.0.0.0"
+        },
+        "parameters": {
+          "Virtual_Machine_Name": {
+            "value": "[parameters('Virtual_Machine_Name')]"
+          },
+          "Virtual_Machine_Size": {
+            "value": "[parameters('Virtual_Machine_Size')]"
+          },
+          "Data_Disks": {
+            "value": "[parameters('Data_Disks')]"
+          },
+          "Storage_Account_Type": {
+            "value": "Premium_LRS"
+          },
+          "Data_Disk_Size_GB": {
+            "value": "[parameters('Data_Disk_Size_GB')]"
+          },
+          "Data_Disk_Host_Caching": {
+            "value": "[parameters('Data_Disk_Host_Caching')]"
+          },
+          "Ip_Address": {
+            "value": "[parameters('Ip_Address')]"
+          },
+          "Admin_Username": {
+            "value": "[parameters('Admin_Username')]"
+          },
+          "Admin_Password": {
+            "value": "[parameters('Admin_Password')]"
+          },
+          "Virtual_Network": {
+            "value": "[parameters('Virtual_Network')]"
+          },
+          "Virtual_Network_Resource_Group": {
+            "value": "[parameters('Virtual_Network_Resource_Group')]"
+          },
+          "Subnet": {
+            "value": "[parameters('Subnet')]"
+          }
+        }
+      }
+    }
+  ],
+  "outputs": {
+    "File_Share_Path": {
+      "type": "string",
+      "value": "[concat('\\\\', parameters('Ip_Address'), '\\Share')]"
+    }
+  }
+}

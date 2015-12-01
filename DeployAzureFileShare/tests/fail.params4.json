@@ -17,8 +17,8 @@
     "Data_Disk_Host_Caching": {
       "value": "ReadOnly"
     },
-    "Ip_Address_Typebadname": {
-      "value": "Dynamic"
+    "Storage_Account_Type": {
+      "value": "Premium_LRS"
     },
     "Ip_Address": {
       "value": ""

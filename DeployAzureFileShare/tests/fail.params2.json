@@ -6,7 +6,7 @@
       "value": "TestVmName1236767"
     },
     "Virtual_Machine_Size": {
-      "value": "Standard_A2"
+      "value": "Standard_A2: 1000 cores, 100000 cpus, 121344 data disks"
     },
     "Data_Disks": {
       "value": 1
@@ -15,13 +15,13 @@
       "value": 512
     },
     "Data_Disk_Host_Caching": {
-      "value": "ReadOnly"
+      "value": "notacache"
     },
-    "Ip_Address_Type": {
-      "value": "Dynamic"
+    "Storage_Account_Type": {
+      "value": "Standard_RAGRS"
     },
     "Ip_Address": {
-      "value": ""
+      "value": "something"
     },
     "Admin_Username": {
       "value": "Blarghah"

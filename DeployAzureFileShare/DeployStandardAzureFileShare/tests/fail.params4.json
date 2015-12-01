@@ -3,10 +3,10 @@
   "contentVersion": "1.0.0.0",
   "parameters": {
     "Virtual_Machine_Name": {
-      "value": "Tsdfsdf"
+      "value": "TestVmName1236767"
     },
     "Virtual_Machine_Size": {
-      "value": "Standard_DS3: 1000 cores, 100000 cpus, 121344 data disks"
+      "value": "Standard_DS3: blah blah blah"
     },
     "Data_Disks": {
       "value": 1
@@ -18,16 +18,16 @@
       "value": "ReadOnly"
     },
     "Storage_Account_Type": {
-      "value": "notatype"
+      "value": "Standard_LRS"
     },
     "Ip_Address": {
       "value": ""
     },
     "Admin_Username": {
-      "value": "Blarghah"
+      "value": "Blarghagh"
     },
     "Admin_Password": {
-      "value": "Blarghaha1"
+      "value": "Blarghaa1"
     },
     "Virtual_Network": {
       "value": "Unidesk-ARM-Site-to-Site"

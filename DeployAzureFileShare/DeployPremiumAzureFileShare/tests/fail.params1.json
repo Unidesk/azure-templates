@@ -6,7 +6,7 @@
       "value": "Tsdfsdf"
     },
     "Virtual_Machine_Size": {
-      "value": "Standard_DS3: 1000 cores, 100000 cpus, 121344 data disks"
+      "value": "Standard_DS3: 4 cores, 14 GB RAM, 8 data disks"
     },
     "Data_Disks": {
       "value": 1
@@ -15,10 +15,7 @@
       "value": 512
     },
     "Data_Disk_Host_Caching": {
-      "value": "ReadOnly"
-    },
-    "Storage_Account_Type": {
-      "value": "notatype"
+      "value": "whoops"
     },
     "Ip_Address": {
       "value": ""

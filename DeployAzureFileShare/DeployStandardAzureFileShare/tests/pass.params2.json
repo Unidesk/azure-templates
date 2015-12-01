@@ -3,13 +3,16 @@
   "contentVersion": "1.0.0.0",
   "parameters": {
     "Virtual_Machine_Name": {
-      "value": "Tsdfsdf"
+      "value": "TestVmName1236767"
     },
     "Virtual_Machine_Size": {
-      "value": "Standard_DS3: 1000 cores, 100000 cpus, 121344 data disks"
+      "value": "Standard_D3: 4 cores, 14 GB RAM, 8 data disks"
     },
     "Data_Disks": {
       "value": 1
+    },
+    "Storage_Account_Type": {
+      "value": "Standard_LRS"
     },
     "Data_Disk_Size_GB": {
       "value": 512
@@ -17,11 +20,8 @@
     "Data_Disk_Host_Caching": {
       "value": "ReadOnly"
     },
-    "Storage_Account_Type": {
-      "value": "notatype"
-    },
     "Ip_Address": {
-      "value": ""
+      "value": "whatever"
     },
     "Admin_Username": {
       "value": "Blarghah"

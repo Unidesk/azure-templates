@@ -6,7 +6,7 @@
       "value": "TestVmName1236767"
     },
     "Virtual_Machine_Size": {
-      "value": "Standard_DS1"
+      "value": "Standard_DS1: 1000 cores, 100000 cpus, 121344 data disks"
     },
     "Data_Disks": {
       "value": 8
@@ -16,6 +16,9 @@
     },
     "Data_Disk_Host_Caching": {
       "value": "ReadOnly"
+    },
+    "Storage_Account_Type": {
+      "value": "Premium_LRS"
     },
     "Ip_Address": {
       "value": "10.8.0.198"

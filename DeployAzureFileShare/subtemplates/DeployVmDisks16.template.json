@@ -1,0 +1,219 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+    "Vm_Name": {
+      "type": "string"
+    },
+    "Hardware_Profile": {
+      "type": "object"
+    },
+    "Os_Profile": {
+      "type": "secureObject"
+    },
+    "Network_Profile": {
+      "type": "object"
+    },
+    "Image_Reference": {
+      "type": "object"
+    },
+    "Os_Disk": {
+      "type": "object"
+    },
+    "Data_Disk_Name_Prefix": {
+      "type": "string"
+    },
+    "Data_Disk_Size_GB": {
+      "type": "int"
+    },
+    "Data_Disk_Host_Caching": {
+      "type": "string"
+    },
+    "Storage_Account": {
+      "type": "string"
+    },
+    "Storage_Container": {
+      "type": "string"
+    }
+  },
+  "variables": {},
+  "resources": [
+    {
+      "apiVersion": "2015-06-15",
+      "type": "Microsoft.Compute/virtualMachines",
+      "name": "[parameters('Vm_Name')]",
+      "location": "[resourceGroup().location]",
+      "properties": {
+        "hardwareProfile": "[parameters('Hardware_Profile')]",
+        "osProfile": "[parameters('Os_Profile')]",
+        "storageProfile": {
+          "imageReference": "[parameters('Image_Reference')]",
+          "osDisk": "[parameters('Os_Disk')]",
+          "dataDisks": [
+            {
+              "name": "[concat(parameters('Data_Disk_Name_Prefix'), '0')]",
+              "diskSizeGB": "[parameters('Data_Disk_Size_GB')]",
+              "lun": "0",
+              "vhd": {
+                "uri": "[concat('https://', parameters('Storage_Account'), '.blob.core.windows.net/', parameters('Storage_Container'), '/', parameters('Data_Disk_Name_Prefix'), '0.vhd')]"
+              },
+              "createOption": "Empty",
+              "caching": "[parameters('Data_Disk_Host_Caching')]"
+            },
+            {
+              "name": "[concat(parameters('Data_Disk_Name_Prefix'), '1')]",
+              "diskSizeGB": "[parameters('Data_Disk_Size_GB')]",
+              "lun": "1",
+              "vhd": {
+                "uri": "[concat('https://', parameters('Storage_Account'), '.blob.core.windows.net/', parameters('Storage_Container'), '/', parameters('Data_Disk_Name_Prefix'), '1.vhd')]"
+              },
+              "createOption": "Empty",
+              "caching": "[parameters('Data_Disk_Host_Caching')]"
+            },
+            {
+              "name": "[concat(parameters('Data_Disk_Name_Prefix'), '2')]",
+              "diskSizeGB": "[parameters('Data_Disk_Size_GB')]",
+              "lun": "2",
+              "vhd": {
+                "uri": "[concat('https://', parameters('Storage_Account'), '.blob.core.windows.net/', parameters('Storage_Container'), '/', parameters('Data_Disk_Name_Prefix'), '2.vhd')]"
+              },
+              "createOption": "Empty",
+              "caching": "[parameters('Data_Disk_Host_Caching')]"
+            },
+            {
+              "name": "[concat(parameters('Data_Disk_Name_Prefix'), '3')]",
+              "diskSizeGB": "[parameters('Data_Disk_Size_GB')]",
+              "lun": "3",
+              "vhd": {
+                "uri": "[concat('https://', parameters('Storage_Account'), '.blob.core.windows.net/', parameters('Storage_Container'), '/', parameters('Data_Disk_Name_Prefix'), '3.vhd')]"
+              },
+              "createOption": "Empty",
+              "caching": "[parameters('Data_Disk_Host_Caching')]"
+            },
+            {
+              "name": "[concat(parameters('Data_Disk_Name_Prefix'), '4')]",
+              "diskSizeGB": "[parameters('Data_Disk_Size_GB')]",
+              "lun": "4",
+              "vhd": {
+                "uri": "[concat('https://', parameters('Storage_Account'), '.blob.core.windows.net/', parameters('Storage_Container'), '/', parameters('Data_Disk_Name_Prefix'), '4.vhd')]"
+              },
+              "createOption": "Empty",
+              "caching": "[parameters('Data_Disk_Host_Caching')]"
+            },
+            {
+              "name": "[concat(parameters('Data_Disk_Name_Prefix'), '5')]",
+              "diskSizeGB": "[parameters('Data_Disk_Size_GB')]",
+              "lun": "5",
+              "vhd": {
+                "uri": "[concat('https://', parameters('Storage_Account'), '.blob.core.windows.net/', parameters('Storage_Container'), '/', parameters('Data_Disk_Name_Prefix'), '5.vhd')]"
+              },
+              "createOption": "Empty",
+              "caching": "[parameters('Data_Disk_Host_Caching')]"
+            },
+            {
+              "name": "[concat(parameters('Data_Disk_Name_Prefix'), '6')]",
+              "diskSizeGB": "[parameters('Data_Disk_Size_GB')]",
+              "lun": "6",
+              "vhd": {
+                "uri": "[concat('https://', parameters('Storage_Account'), '.blob.core.windows.net/', parameters('Storage_Container'), '/', parameters('Data_Disk_Name_Prefix'), '6.vhd')]"
+              },
+              "createOption": "Empty",
+              "caching": "[parameters('Data_Disk_Host_Caching')]"
+            },
+            {
+              "name": "[concat(parameters('Data_Disk_Name_Prefix'), '7')]",
+              "diskSizeGB": "[parameters('Data_Disk_Size_GB')]",
+              "lun": "7",
+              "vhd": {
+                "uri": "[concat('https://', parameters('Storage_Account'), '.blob.core.windows.net/', parameters('Storage_Container'), '/', parameters('Data_Disk_Name_Prefix'), '7.vhd')]"
+              },
+              "createOption": "Empty",
+              "caching": "[parameters('Data_Disk_Host_Caching')]"
+            },
+            {
+              "name": "[concat(parameters('Data_Disk_Name_Prefix'), '8')]",
+              "diskSizeGB": "[parameters('Data_Disk_Size_GB')]",
+              "lun": "8",
+              "vhd": {
+                "uri": "[concat('https://', parameters('Storage_Account'), '.blob.core.windows.net/', parameters('Storage_Container'), '/', parameters('Data_Disk_Name_Prefix'), '8.vhd')]"
+              },
+              "createOption": "Empty",
+              "caching": "[parameters('Data_Disk_Host_Caching')]"
+            },
+            {
+              "name": "[concat(parameters('Data_Disk_Name_Prefix'), '9')]",
+              "diskSizeGB": "[parameters('Data_Disk_Size_GB')]",
+              "lun": "9",
+              "vhd": {
+                "uri": "[concat('https://', parameters('Storage_Account'), '.blob.core.windows.net/', parameters('Storage_Container'), '/', parameters('Data_Disk_Name_Prefix'), '9.vhd')]"
+              },
+              "createOption": "Empty",
+              "caching": "[parameters('Data_Disk_Host_Caching')]"
+            },
+            {
+              "name": "[concat(parameters('Data_Disk_Name_Prefix'), '10')]",
+              "diskSizeGB": "[parameters('Data_Disk_Size_GB')]",
+              "lun": "10",
+              "vhd": {
+                "uri": "[concat('https://', parameters('Storage_Account'), '.blob.core.windows.net/', parameters('Storage_Container'), '/', parameters('Data_Disk_Name_Prefix'), '10.vhd')]"
+              },
+              "createOption": "Empty",
+              "caching": "[parameters('Data_Disk_Host_Caching')]"
+            },
+            {
+              "name": "[concat(parameters('Data_Disk_Name_Prefix'), '11')]",
+              "diskSizeGB": "[parameters('Data_Disk_Size_GB')]",
+              "lun": "11",
+              "vhd": {
+                "uri": "[concat('https://', parameters('Storage_Account'), '.blob.core.windows.net/', parameters('Storage_Container'), '/', parameters('Data_Disk_Name_Prefix'), '11.vhd')]"
+              },
+              "createOption": "Empty",
+              "caching": "[parameters('Data_Disk_Host_Caching')]"
+            },
+            {
+              "name": "[concat(parameters('Data_Disk_Name_Prefix'), '12')]",
+              "diskSizeGB": "[parameters('Data_Disk_Size_GB')]",
+              "lun": "12",
+              "vhd": {
+                "uri": "[concat('https://', parameters('Storage_Account'), '.blob.core.windows.net/', parameters('Storage_Container'), '/', parameters('Data_Disk_Name_Prefix'), '12.vhd')]"
+              },
+              "createOption": "Empty",
+              "caching": "[parameters('Data_Disk_Host_Caching')]"
+            },
+            {
+              "name": "[concat(parameters('Data_Disk_Name_Prefix'), '13')]",
+              "diskSizeGB": "[parameters('Data_Disk_Size_GB')]",
+              "lun": "13",
+              "vhd": {
+                "uri": "[concat('https://', parameters('Storage_Account'), '.blob.core.windows.net/', parameters('Storage_Container'), '/', parameters('Data_Disk_Name_Prefix'), '13.vhd')]"
+              },
+              "createOption": "Empty",
+              "caching": "[parameters('Data_Disk_Host_Caching')]"
+            },
+            {
+              "name": "[concat(parameters('Data_Disk_Name_Prefix'), '14')]",
+              "diskSizeGB": "[parameters('Data_Disk_Size_GB')]",
+              "lun": "14",
+              "vhd": {
+                "uri": "[concat('https://', parameters('Storage_Account'), '.blob.core.windows.net/', parameters('Storage_Container'), '/', parameters('Data_Disk_Name_Prefix'), '14.vhd')]"
+              },
+              "createOption": "Empty",
+              "caching": "[parameters('Data_Disk_Host_Caching')]"
+            },
+            {
+              "name": "[concat(parameters('Data_Disk_Name_Prefix'), '15')]",
+              "diskSizeGB": "[parameters('Data_Disk_Size_GB')]",
+              "lun": "15",
+              "vhd": {
+                "uri": "[concat('https://', parameters('Storage_Account'), '.blob.core.windows.net/', parameters('Storage_Container'), '/', parameters('Data_Disk_Name_Prefix'), '15.vhd')]"
+              },
+              "createOption": "Empty",
+              "caching": "[parameters('Data_Disk_Host_Caching')]"
+            }
+          ]
+        },
+        "networkProfile": "[parameters('Network_Profile')]"
+      }
+    }
+  ]
+}

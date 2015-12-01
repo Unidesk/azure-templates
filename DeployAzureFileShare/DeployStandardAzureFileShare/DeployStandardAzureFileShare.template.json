@@ -1,0 +1,220 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+    "Virtual_Machine_Name": {
+      "type": "string",
+      "minLength": 3,
+      "maxLength": 24,
+      "metadata": {
+        "description": "Name of your virtual machine. This will also be used to name all other resources that get created."
+      }
+    },
+    "Virtual_Machine_Size": {
+      "type": "string",
+      "allowedValues": [
+        "Basic_A0: 1 core, 768 MB RAM, 1 data disk",
+        "Basic_A1: 1 core, 1.75 GB RAM, 2 data disks",
+        "Basic_A2: 2 cores, 3.5 GB RAM, 4 data disks",
+        "Basic_A3: 4 cores, 7 GB RAM, 8 data disks",
+        "Basic_A4: 8 cores, 14 GB RAM, 16 data disks",
+        "ExtraSmall: 1 core, 768 MB RAM, 1 data disk",
+        "Small: 1 core, 1.75 GB RAM, 2 data disks",
+        "Medium: 2 cores, 3.5 GB RAM, 4 data disks",
+        "Large: 4 cores, 7 GB RAM, 8 data disks",
+        "ExtraLarge: 8 cores, 14 GB RAM, 16 data disks",
+        "A5: 2 cores, 14 GB RAM, 4 data disks",
+        "A6: 4 cores, 28 GB RAM, 8 data disks",
+        "A7: 8 cores, 56 GB RAM, 16 data disks",
+        "A8: 8 cores, 56 GB RAM, 16 data disks",
+        "A9: 16 cores, 112 GB RAM, 16 data disks",
+        "A10: 8 cores, 56 GB RAM, 16 data disks",
+        "A11: 16 cores, 112 GB RAM, 16 data disks",
+        "Standard_D1: 1 core, 3.5 GB RAM, 2 data disks",
+        "Standard_D2: 2 cores, 7 GB RAM, 4 data disks",
+        "Standard_D3: 4 cores, 14 GB RAM, 8 data disks",
+        "Standard_D4: 8 cores, 28 GB RAM, 16 data disks",
+        "Standard_D11: 2 cores, 14 GB RAM, 4 data disks",
+        "Standard_D12: 4 cores, 28 GB RAM, 8 data disks",
+        "Standard_D13: 8 cores, 56 GB RAM, 16 data disks",
+        "Standard_D14: 16 cores, 112 GB RAM, 32 data disks",
+        "Standard_D1_v2: 1 core, 3.5 GB RAM, 2 data disks",
+        "Standard_D2_v2: 2 cores, 7 GB RAM, 4 data disks",
+        "Standard_D3_v2: 4 cores, 14 GB RAM, 8 data disks",
+        "Standard_D4_v2: 8 cores, 28 GB RAM, 16 data disks",
+        "Standard_D5_v2: 16 cores, 56 GB RAM, 32 data disks",
+        "Standard_D11_v2: 2 cores, 14 GB RAM, 4 data disks",
+        "Standard_D12_v2: 4 cores, 28 GB RAM, 8 data disks",
+        "Standard_D13_v2: 8 cores, 56 GB RAM, 16 data disks",
+        "Standard_D14_v2: 16 cores, 112 GB RAM, 32 data disks",
+        "Standard_G1: 2 cores, 28 GB RAM, 4 data disks",
+        "Standard_G2: 4 cores, 56 GB RAM, 8 data disks",
+        "Standard_G3: 8 cores, 112 GB RAM, 16 data disks",
+        "Standard_G4: 16 cores, 224 GB RAM, 32 data disks",
+        "Standard_G5: 32 cores, 448 GB RAM, 64 data disks"
+      ],
+      "metadata": {
+        "description": "Size of the virtual machine. Not all virtual machines may be available in all locations. Visit here for information about each size: https://azure.microsoft.com/en-us/documentation/articles/virtual-machines-size-specs/#standard-tier-d-series"
+      }
+    },
+    "Data_Disks": {
+      "type": "int",
+      "allowedValues": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        12,
+        16,
+        24,
+        32,
+        48,
+        64
+      ],
+      "metadata": {
+        "description": "Number of Standard data disks to attach to the machine. The VM size you select MUST support this many disks, otherwise the deployment will fail. Visit here for information about each size: https://azure.microsoft.com/en-us/documentation/articles/virtual-machines-size-specs/#standard-tier-d-series"
+      }
+    },
+    "Storage_Account_Type": {
+      "type": "string",
+      "defaultValue": "Standard_LRS",
+      "allowedValues": [
+        "Standard_LRS",
+        "Standard_GRS",
+        "Standard_RAGRS"
+      ],
+      "metadata": {
+        "description": "Storage account type to use. To select premium storage, you must use the Premium file share template."
+      }
+    },
+    "Data_Disk_Size_GB": {
+      "type": "int",
+      "defaultValue": 100,
+      "minValue": 1,
+      "maxValue": 1023,
+      "metadata": {
+        "description": "Capacity of each data disk in GB."
+      }
+    },
+    "Data_Disk_Host_Caching": {
+      "type": "string",
+      "defaultValue": "None",
+      "allowedValues": [
+        "ReadWrite",
+        "ReadOnly",
+        "None"
+      ],
+      "metadata": {
+        "description": "Caching policy to use for each disk."
+      }
+    },
+    "Ip_Address": {
+      "type": "string",
+      "metadata": {
+        "description": "The static IP address of the virtual machine. This IP address must reside in the virtual network's subnet."
+      }
+    },
+    "Admin_Username": {
+      "type": "string",
+      "minLength": 3,
+      "maxLength": 20,
+      "metadata": {
+        "description": "Username of the administrator account that will be created on the virtual machine."
+      }
+    },
+    "Admin_Password": {
+      "type": "securestring",
+      "minLength": 8,
+      "maxLength": 127,
+      "metadata": {
+        "description": "Password of the administrator account on the virtual machine."
+      }
+    },
+    "Virtual_Network": {
+      "type": "string",
+      "defaultValue": "unidesk-arm-nov11-eastus",
+      "metadata": {
+        "description": "Virtual network to deploy the virtual machine in."
+      }
+    },
+    "Virtual_Network_Resource_Group": {
+      "type": "string",
+      "defaultValue": "unidesk-arm-nov11-eastus-group",
+      "metadata": {
+        "description": "Resource group of the virtual network."
+      }
+    },
+    "Subnet": {
+      "type": "string",
+      "defaultValue": "default",
+      "metadata": {
+        "description": "Virtual network subnet to deploy the virtual machine in."
+      }
+    }
+  },
+  "variables": {
+    "fileShareTemplateUrl": "https://raw.githubusercontent.com/Unidesk/azure-templates/master/DeployAzureFileShare/DeployAzureFileShare.template.json"
+  },
+  "resources": [
+    {
+      "apiVersion": "2015-01-01",
+      "type": "Microsoft.Resources/deployments",
+      "name": "file-share-deployment",
+      "properties": {
+        "mode": "Incremental",
+        "templateLink": {
+          "uri": "[variables('fileShareTemplateUrl')]",
+          "contentVersion": "1.0.0.0"
+        },
+        "parameters": {
+          "Virtual_Machine_Name": {
+            "value": "[parameters('Virtual_Machine_Name')]"
+          },
+          "Virtual_Machine_Size": {
+            "value": "[parameters('Virtual_Machine_Size')]"
+          },
+          "Data_Disks": {
+            "value": "[parameters('Data_Disks')]"
+          },
+          "Storage_Account_Type": {
+            "value": "[parameters('Storage_Account_Type')]"
+          },
+          "Data_Disk_Size_GB": {
+            "value": "[parameters('Data_Disk_Size_GB')]"
+          },
+          "Data_Disk_Host_Caching": {
+            "value": "[parameters('Data_Disk_Host_Caching')]"
+          },
+          "Ip_Address": {
+            "value": "[parameters('Ip_Address')]"
+          },
+          "Admin_Username": {
+            "value": "[parameters('Admin_Username')]"
+          },
+          "Admin_Password": {
+            "value": "[parameters('Admin_Password')]"
+          },
+          "Virtual_Network": {
+            "value": "[parameters('Virtual_Network')]"
+          },
+          "Virtual_Network_Resource_Group": {
+            "value": "[parameters('Virtual_Network_Resource_Group')]"
+          },
+          "Subnet": {
+            "value": "[parameters('Subnet')]"
+          }
+        }
+      }
+    }
+  ],
+  "outputs": {
+    "File_Share_Path": {
+      "type": "string",
+      "value": "[concat('\\\\', parameters('Ip_Address'), '\\Share')]"
+    }
+  }
+}
