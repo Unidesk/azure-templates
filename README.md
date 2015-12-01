@@ -1,8 +1,8 @@
 # Unidesk Azure Templates
 
 Use these links to deploy a new Windows file share VM:
-* [with standard storage](https://portal.azure.com/#create/Microsoft.Template/uri/https%3A%2F%2Fraw.githubusercontent.com%2FUnidesk%2Fazure-templates%2Fmaster%2FDeployPremiumAzureFileShare%2FDeployPremiumAzureFileShare.template.json)
-* [with premium storage](https://portal.azure.com/#create/Microsoft.Template/uri/https%3A%2F%2Fraw.githubusercontent.com%2FUnidesk%2Fazure-templates%2Fmaster%2FDeployStandardAzureFileShare%2FDeployStandardAzureFileShare.template.json)
+* [with standard storage](https://portal.azure.com/#create/Microsoft.Template/uri/https%3A%2F%2Fraw.githubusercontent.com%2FUnidesk%2Fazure-templates%2Fmaster%2FDeployAzureFileShare%2Fstandard%2FDeployStandardAzureFileShare.template.json)
+* [with premium storage](https://portal.azure.com/#create/Microsoft.Template/uri/https%3A%2F%2Fraw.githubusercontent.com%2FUnidesk%2Fazure-templates%2Fmaster%2FDeployAzureFileShare%2Fpremium%2FDeployPremiumAzureFileShare.template.json)
 
 Be aware that premium storage machines cost a lot of money, even when they are not running. The only way to stop them from incurring costs is to delete them.
 
