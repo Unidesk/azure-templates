@@ -213,7 +213,7 @@
             }
           },
           "Data_Disk_Name_Prefix": {
-            "value": "[parameters('Data_Disk_Name_Prefix')]"
+            "value": "[variables('dataDiskPrefix')]"
           },
           "Data_Disk_Size_GB": {
             "value": "[parameters('Data_Disk_Size_GB')]"
