@@ -118,8 +118,11 @@
     "containerName": "vhds",
     "vnetID": "[resourceId(parameters('Virtual_Network_Resource_Group'), 'Microsoft.Network/virtualNetworks', parameters('Virtual_Network'))]",
     "subnetRef": "[concat(variables('vnetID'),'/subnets/',parameters('Subnet'))]",
-    "scriptFileUrl": "https://unideskintegrationtest.blob.core.windows.net/resources-do-not-delete/SetupFileShare.ps1",
-    "scriptFileName": "SetupFileShare.ps1"
+    "scriptStorageAccountName": "unideskintegrationtest",
+    "scriptStorageResourceGroup": "unidesk-test-resources",
+    "scriptFileName": "SetupFileShare.ps1",
+    "scriptFileUrl": "[concat('https://', variables('scriptStorageAccountName'), '.blob.core.windows.net/resources-do-not-delete/', variables('scriptFileName'))]",
+    "scriptStorageAccountId": "[concat('/subscriptions/', subscription().subscriptionId, '/resourceGroups/', variables('scriptStorageResourceGroup'), '/providers/Microsoft.Storage/storageAccounts/', variables('scriptStorageAccountName'))]"
   },
   "resources": [
     {
@@ -217,12 +220,17 @@
       "properties": {
         "publisher": "Microsoft.Compute",
         "type": "CustomScriptExtension",
-        "typeHandlerVersion": "1.2",
+        "typeHandlerVersion": "1.3",
+        "autoUpgradeMinorVersion": "true",
         "settings": {
           "fileUris": [
             "[variables('scriptFileUrl')]"
           ],
           "commandToExecute": "[concat('powershell -ExecutionPolicy Unrestricted -file ', variables('scriptFileName'))]"
+        },
+        "protectedSettings": {
+          "storageAccountName": "[variables('scriptStorageAccountName')]",
+          "storageAccountKey": "[listKeys(variables('scriptStorageAccountId'), '2015-05-01-preview').key1]"
         }
       }
     }
