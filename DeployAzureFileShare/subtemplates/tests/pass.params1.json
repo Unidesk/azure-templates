@@ -1,0 +1,39 @@
+{
+  "$schema": "http://schema.management.azure.com/schemas/2015-01-01/deploymentParameters.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+    "Vm_Name": {
+      "value": "IAmVm"
+    },
+    "Hardware_Profile": {
+      "value": {}
+    },
+    "Os_Profile": {
+      "value": {}
+    },
+    "Network_Profile": {
+      "value": {}
+    },
+    "Image_Reference": {
+      "value": {}
+    },
+    "Os_Disk": {
+      "value": {}
+    },
+    "Data_Disk_Name_Prefix": {
+      "value": "wat"
+    },
+    "Data_Disk_Size_GB": {
+      "value": 128
+    },
+    "Data_Disk_Host_Caching": {
+      "value": "ReadOnly"
+    },
+    "Storage_Account": {
+      "value": "myaccount"
+    },
+    "Storage_Container": {
+      "value": "mycontainer"
+    }
+  }
+}

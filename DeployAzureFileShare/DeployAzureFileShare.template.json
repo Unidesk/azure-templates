@@ -33,10 +33,10 @@
     },
     "Data_Disks": {
       "type": "int",
-      "defaultValue": 1,
-      "allowedValues": [1],
+      "minValue": 1,
+      "maxValue": 8,
       "metadata": {
-        "description": "Number of data disks (SSDs) to attach to the machine. To change this number, you must use a different template."
+        "description": "Number of data disks (SSDs) to attach to the machine. The VM size you select MUST support this many disks, otherwise the deployment will fail. Visit here for information about each size: https://azure.microsoft.com/en-us/documentation/articles/virtual-machines-size-specs/#standard-tier-d-series"
       }
     },
     "Data_Disk_Size_GB": {
@@ -118,11 +118,12 @@
     "containerName": "vhds",
     "vnetID": "[resourceId(parameters('Virtual_Network_Resource_Group'), 'Microsoft.Network/virtualNetworks', parameters('Virtual_Network'))]",
     "subnetRef": "[concat(variables('vnetID'),'/subnets/',parameters('Subnet'))]",
-    "scriptStorageAccountName": "unideskintegrationtest",
     "scriptStorageResourceGroup": "unidesk-test-resources",
+    "scriptStorageAccountName": "unideskintegrationtest",
     "scriptFileName": "SetupFileShare.ps1",
     "scriptFileUrl": "[concat('https://', variables('scriptStorageAccountName'), '.blob.core.windows.net/resources-do-not-delete/', variables('scriptFileName'))]",
-    "scriptStorageAccountId": "[concat('/subscriptions/', subscription().subscriptionId, '/resourceGroups/', variables('scriptStorageResourceGroup'), '/providers/Microsoft.Storage/storageAccounts/', variables('scriptStorageAccountName'))]"
+    "scriptStorageAccountId": "[concat('/subscriptions/', subscription().subscriptionId, '/resourceGroups/', variables('scriptStorageResourceGroup'), '/providers/Microsoft.Storage/storageAccounts/', variables('scriptStorageAccountName'))]",
+    "vmTemplateUrlPrefix": "https://raw.githubusercontent.com/Unidesk/azure-templates/master/DeployAzureFileShare/subtemplates/DeployVmDisks"
   },
   "resources": [
     {
@@ -155,57 +156,77 @@
       }
     },
     {
-      "apiVersion": "2015-06-15",
-      "type": "Microsoft.Compute/virtualMachines",
-      "name": "[parameters('Virtual_Machine_Name')]",
-      "location": "[resourceGroup().location]",
+      "apiVersion": "2015-01-01",
+      "type": "Microsoft.Resources/deployments",
+      "name": "virtual-machine-deployment",
       "dependsOn": [
         "[concat('Microsoft.Network/networkInterfaces/', variables('nicName'))]",
         "[concat('Microsoft.Storage/storageAccounts/', variables('storageAccountName'))]"
       ],
       "properties": {
-        "hardwareProfile": {
-          "vmSize": "[parameters('Virtual_Machine_Size')]"
+        "mode": "Incremental",
+        "templateLink": {
+          "uri": "[concat(variables('vmTemplateUrlPrefix'), parameters('Data_Disks'), '.template.json')]",
+          "contentVersion": "1.0.0.0"
         },
-        "osProfile": {
-          "computername": "[parameters('Virtual_Machine_Name')]",
-          "adminUsername": "[parameters('Admin_Username')]",
-          "adminPassword": "[parameters('Admin_Password')]"
-        },
-        "storageProfile": {
-          "imageReference": {
-            "publisher": "[variables('imagePublisher')]",
-            "offer": "[variables('imageOffer')]",
-            "sku": "[variables('windowsOSVersion')]",
-            "version": "latest"
+        "parameters": {
+          "Vm_Name": {
+            "value": "[parameters('Virtual_Machine_Name')]"
           },
-          "osDisk": {
-            "name": "[variables('osDiskName')]",
-            "vhd": {
-              "uri": "[concat('https://',variables('storageAccountName'),'.blob.core.windows.net/',variables('containerName'),'/',variables('osDiskName'),'.vhd')]"
+          "Hardware_Profile": {
+            "value": {
+              "vmSize": "[parameters('Virtual_Machine_Size')]"
             },
-            "caching": "ReadWrite",
-            "createOption": "FromImage"
           },
-          "dataDisks": [
-            {
-              "name": "[concat(variables('dataDiskPrefix'), '0')]",
-              "diskSizeGB": "[parameters('Data_Disk_Size_GB')]",
-              "lun": "0",
+          "Os_Profile": {
+            "value": {
+              "computername": "[parameters('Virtual_Machine_Name')]",
+              "adminUsername": "[parameters('Admin_Username')]",
+              "adminPassword": "[parameters('Admin_Password')]"
+            }
+          },
+          "Network_Profile": {
+            "value": {
+              "networkInterfaces": [
+                {
+                  "id": "[resourceId('Microsoft.Network/networkInterfaces',variables('nicName'))]"
+                }
+              ]
+            }
+          },
+          "Image_Reference": {
+            "value": {
+              "publisher": "[variables('imagePublisher')]",
+              "offer": "[variables('imageOffer')]",
+              "sku": "[variables('windowsOSVersion')]",
+              "version": "latest"
+            }
+          },
+          "Os_Disk": {
+            "value": {
+              "name": "[variables('osDiskName')]",
               "vhd": {
-                "uri": "[concat('https://', variables('storageAccountName'), '.blob.core.windows.net/', variables('containerName'), '/', variables('dataDiskPrefix'), '0.vhd')]"
+                "uri": "[concat('https://',variables('storageAccountName'),'.blob.core.windows.net/',variables('containerName'),'/',variables('osDiskName'),'.vhd')]"
               },
-              "createOption": "Empty",
-              "caching": "[parameters('Data_Disk_Host_Caching')]"
+              "caching": "ReadWrite",
+              "createOption": "FromImage"
             }
-          ]
-        },
-        "networkProfile": {
-          "networkInterfaces": [
-            {
-              "id": "[resourceId('Microsoft.Network/networkInterfaces',variables('nicName'))]"
-            }
-          ]
+          },
+          "Data_Disk_Name_Prefix": {
+            "value": "[parameters('Data_Disk_Name_Prefix')]"
+          },
+          "Data_Disk_Size_GB": {
+            "value": "[parameters('Data_Disk_Size_GB')]"
+          },
+          "Data_Disk_Host_Caching": {
+            "value": "[parameters('Data_Disk_Host_Caching')]"
+          },
+          "Storage_Account": {
+            "value": "[variables('storageAccountName')]"
+          },
+          "Storage_Container": {
+            "value": "[variables('containerName')]"
+          }
         }
       }
     },
@@ -215,7 +236,7 @@
       "type": "Microsoft.Compute/virtualMachines/extensions",
       "location": "[resourceGroup().location]",
       "dependsOn": [
-        "[concat('Microsoft.Compute/virtualMachines/', parameters('Virtual_Machine_Name'))]"
+        "Microsoft.Resources/deployments/virtual-machine-deployment"
       ],
       "properties": {
         "publisher": "Microsoft.Compute",

@@ -1,15 +1,15 @@
 param (
     [parameter()]
-    [string]$SubscriptionName,
+    [string]$SubscriptionName = "BizSpark Plus",
 
     [parameter()]
-    [string]$ResourceGroup,
+    [string]$ResourceGroup = "unidesk-test-resources",
 
     [parameter()]
-    [string]$StorageAccount,
+    [string]$StorageAccount = "unideskintegrationtest",
 
     [parameter()]
-    [string]$StorageContainer,
+    [string]$StorageContainer = "resources-do-not-delete",
 
     [parameter()]
     [string]$ScriptFile = "SetupFileShare.ps1"

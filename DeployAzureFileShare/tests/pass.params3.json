@@ -9,7 +9,7 @@
       "value": "Standard_DS1"
     },
     "Data_Disks": {
-      "value": 1
+      "value": 8
     },
     "Data_Disk_Size_GB": {
       "value": 512
