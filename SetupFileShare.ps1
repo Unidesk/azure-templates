@@ -12,4 +12,4 @@ $newPartition = $newDisk | New-Partition -AssignDriveLetter -UseMaximumSize
 $newVolume = $newPartition | Format-Volume -FileSystem NTFS -NewFileSystemLabel "UnideskFileShare" -Confirm:$false
 
 $sharePath = $newVolume.DriveLetter + ":\"
-New-SmbShare -Name Share -Path $sharePath -FullAccess $env:username
+New-SmbShare -Name Share -Path $sharePath -FullAccess Users
