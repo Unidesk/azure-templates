@@ -43,7 +43,7 @@ function RunTests($templateFile) {
         $expectFailure = $paramFile.ToString().StartsWith("fail.")
 
         $fullParamFilePath = Join-Path $testFolder $paramFile
-        Write-Host "Testing with file:", $fullParamFilePath, "( expecting failure:", $expectFailure, ")"
+        Write-Host "Testing:", $fullParamFilePath, "( expecting failure:", $expectFailure, ")"
         
         $result = Test-AzureResourceGroupTemplate -ResourceGroupName $ResourceGroup -TemplateFile $templateFile.FullName -TemplateParameterFile $fullParamFilePath -ErrorAction Stop -WarningAction SilentlyContinue
         
@@ -54,7 +54,7 @@ function RunTests($templateFile) {
             }
         } else {
             if ($expectFailure) {
-                Write-Host "Template passed when failure was expected."
+                Write-Host "TEST FAILED: Template passed when failure was expected."
                 $numFailed += 1
             }
         }
@@ -70,6 +70,7 @@ function RunTestsOnTemplates($folder) {
         }
         else {
             if ($child.Name.EndsWith(".template.json")) {
+                Write-Host
                 Write-Host "Found template:", $child
                 RunTests($child)
             }
@@ -78,11 +79,5 @@ function RunTestsOnTemplates($folder) {
 }
 
 RunTestsOnTemplates($TemplateFolder)
-
-if ($numFailed -gt 0) {
-    Write-Host $numFailed, "test(s) failed."
-} else {
-    Write-Host "All tests passed."
-}
 
 Write-Host

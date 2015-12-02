@@ -6,7 +6,7 @@
       "value": "TestVmName1236767"
     },
     "Virtual_Machine_Size": {
-      "value": "A3: 4 cores, 7 GB RAM, 8 data disks"
+      "value": "Standard_A3: 4 cores, 7 GB RAM, 8 data disks"
     },
     "Data_Disks": {
       "value": 64
