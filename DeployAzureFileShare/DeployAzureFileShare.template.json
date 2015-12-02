@@ -57,7 +57,7 @@
     "osDiskName": "[concat(parameters('Virtual_Machine_Name'),'-OSDisk')]",
     "dataDiskPrefix": "[concat(parameters('Virtual_Machine_Name'),'-DataDisk-')]",
     "nicName": "[concat(parameters('Virtual_Machine_Name'),'-NIC')]",
-    "storageAccountName": "[concat(replace(parameters('Virtual_Machine_Name'), '-', ''), 'udstorage')]",
+    "storageAccountName": "[concat(replace(parameters('Virtual_Machine_Name'), '-', ''), 'udstore')]",
     "containerName": "vhds",
     "vnetID": "[resourceId(parameters('Virtual_Network_Resource_Group'), 'Microsoft.Network/virtualNetworks', parameters('Virtual_Network'))]",
     "subnetRef": "[concat(variables('vnetID'),'/subnets/',parameters('Subnet'))]",

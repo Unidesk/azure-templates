@@ -5,7 +5,7 @@
     "Virtual_Machine_Name": {
       "type": "string",
       "minLength": 3,
-      "maxLength": 24,
+      "maxLength": 17,
       "metadata": {
         "description": "Name of your virtual machine. This will also be used to name all other resources that get created."
       }
