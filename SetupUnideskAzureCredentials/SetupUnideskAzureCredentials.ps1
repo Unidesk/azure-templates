@@ -25,6 +25,7 @@ if ($module.Version.Major -lt 1) {
 
 function ReadFromList($prompt, $options, $displayProperties) 
 {
+    Write-Host "---------------------------------------------"
     Write-Host
     Write-Host $prompt
 
@@ -60,17 +61,8 @@ function ReadFromList($prompt, $options, $displayProperties)
 function SetupAzureAccount() {
     # Prompt user for credentials
     Write-Host
-    $account = Get-AzureAccount -WarningAction SilentlyContinue
-    if ($account -eq $null) {
-        Login-AzureRmAccount -ErrorAction Stop -WarningAction SilentlyContinue
-    } else {
-        $accountTest = Get-AzureRmSubscription -ErrorAction Ignore -WarningAction SilentlyContinue
-        if ($accountTest -eq $null) {
-            Write-Host "Azure credentials have expired, please re-enter them."
-            Login-AzureRmAccount -ErrorAction Stop -WarningAction SilentlyContinue
-        }
-        Write-Host "Using Azure account '$($account.Id)'"
-    }
+    Login-AzureRmAccount | Out-Null
+    Write-Host "Using Azure account '$($account.Id)'"
 }
 
 function SetupRoleDefinition($subId) {
@@ -115,25 +107,29 @@ function SetupRoleDefinition($subId) {
 
 function GetPlainTextPassword() {
     $passwordMinLength = 12
-
+    
+    Write-Host "---------------------------------------------"
+    Write-Host
     Write-Host "Enter a Client Secret for your Unidesk ELM credentials, at least" $passwordMinLength "characters long."
 
     $passwordPrompt = "-->REMEMBER AND SAFEGUARD THIS VALUE, it will never be displayed again and will be needed to set up Unidesk!<--"
     do {
+        Write-Host
         Write-Host $passwordPrompt
+        Write-Host
 
-        $SecurePassword = Read-Host -Prompt "Client Secret: " -AsSecureString
+        $SecurePassword = Read-Host -Prompt "Client Secret" -AsSecureString
         $plainPassword = [Runtime.InteropServices.Marshal]::PtrToStringAuto([Runtime.InteropServices.Marshal]::SecureStringToBSTR($SecurePassword))
 
         if ($plainPassword.Length -lt $passwordMinLength) {
-            $passwordPrompt = "Client secret is not long enough, try again."
+            $passwordPrompt = "Client secret is not long enough, please try again."
             continue
         }
 
-        $ConfirmPassword = Read-Host -Prompt "Confirm: " -AsSecureString
+        $ConfirmPassword = Read-Host -Prompt "      Confirm" -AsSecureString
         $plainConfirm = [Runtime.InteropServices.Marshal]::PtrToStringAuto([Runtime.InteropServices.Marshal]::SecureStringToBSTR($ConfirmPassword))
 
-        $passwordPrompt = "Client secrets do not match, try again."
+        $passwordPrompt = "Client secrets do not match, please try again."
     }
     while (-not ($plainConfirm -ceq $plainPassword))
 
@@ -160,7 +156,10 @@ if ($existingServicePrincipal -eq $null) {
     $password = GetPlainTextPassword
     $adApp = New-AzureRmADApplication -DisplayName "Unidesk ELM Access" -HomePage "http://unused" -IdentifierUris $identifierUri -Password $password
     $adServicePrincipal = New-AzureRmADServicePrincipal -ApplicationId $adApp.ApplicationId
+    
     # Give Azure a moment to set up the service principal
+    Write-Host
+    Write-Host "Setting up Azure Active Directory application..."
     Sleep 10
 }
 else {
@@ -178,13 +177,15 @@ if ($existingRoleAssignment -eq $null) {
 }
 
 Write-Host
+Write-Host "---------------------------------------------"
 Write-Host "Your Unidesk credentials have been set up successfully. Enter these values into the connector configuration page:"
 Write-Host
-Write-Host "Subscription ID:" $SubscriptionId
-Write-Host "Tenant ID:" $selectedSubscription.TenantId
-Write-Host "Client ID:" $identifierUri
-Write-Host "Client Secret: ********"
-Write-Host "Storage Account: [Use the name of a storage account you wish to deploy to.]"
+Write-Host "Subscription ID: " $SubscriptionId
+Write-Host "Tenant ID:       " $selectedSubscription.TenantId
+Write-Host "Client ID:       " $identifierUri
+Write-Host "Client Secret:    ********"
+Write-Host "Storage Account:  [Use the name of a storage account you wish to deploy to.]"
 Write-Host 
 Write-Host "Manage your storage accounts in the Azure portal here:"
 Write-Host "https://portal.azure.com/#blade/HubsExtension/BrowseResourceBlade/resourceType/Microsoft.Storage%2FStorageAccounts/scope/"
+Write-Host
