@@ -1,0 +1,3 @@
+@echo Starting Unidesk Azure Credentials Setup Tool...
+@powershell .\SetupUnideskAzureCredentials.ps1
+@pause

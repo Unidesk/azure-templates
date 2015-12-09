@@ -1,27 +1,7 @@
 ﻿
 $ErrorActionPreference = "Stop"
 
-# Check for Azure Powershell installations
-Try {
-    Import-Module Azure
-}
-Catch
-{
-    Write-Host
-    Write-Host "ERROR: You must install Azure Powershell 1.0 or higher to run this script."
-    Write-Host "Visit here to download the installer: https://github.com/Azure/azure-powershell/releases/latest"
-    Break
-}
-
-$module = Get-Module Azure
-if ($module.Version.Major -lt 1) {
-    Write-Host
-    Write-Host "ERROR: You must update Azure Powershell to version 1.0 or higher to run this script."
-    Write-Host "You have version" $module.Version "installed."
-    Write-Host "Uninstall your current version and visit here to download the installer:"
-    Write-Host "https://github.com/Azure/azure-powershell/releases/latest"
-    Break
-}
+Import-Module -Name .\AzureRM.Profile, .\AzureRM.Resources
 
 function ReadFromList($prompt, $options, $displayProperties) 
 {
@@ -62,7 +42,7 @@ function SetupAzureAccount() {
     # Prompt user for credentials
     Write-Host
     Login-AzureRmAccount | Out-Null
-    Write-Host "Using Azure account '$($account.Id)'"
+    #Write-Host "Using Azure account '$($account.Id)'"
 }
 
 function SetupRoleDefinition($subId) {
