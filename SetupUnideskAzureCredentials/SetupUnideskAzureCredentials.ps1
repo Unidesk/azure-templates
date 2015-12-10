@@ -1,4 +1,9 @@
-﻿
+﻿# Copyright (c) 2015 Unidesk Corporation
+# Licensed under the MIT License.  Please refer to the included License.txt file for licensing details.
+
+# This software includes components from Microsoft Azure PowerShell which is licensed under the Apache License, Version 2.0.  Visit  https://github.com/Azure/azure-powershell for additional information.
+# Microsoft Azure PowerShell includes the AutoMapper library ("AutoMapper") which is license under the MIT License.
+
 $ErrorActionPreference = "Stop"
 
 Import-Module -Name .\AzureRM.Profile, .\AzureRM.Resources
