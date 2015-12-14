@@ -6,7 +6,13 @@
 
 $ErrorActionPreference = "Stop"
 
-Import-Module -Name .\AzureRM.Profile, .\AzureRM.Resources
+Write-Host "Loading required module (AzureRM.Profile)..."
+
+Import-Module -Name .\AzureRM.Profile
+
+Write-Host "Loading required module (AzureRM.Resources)..."
+
+Import-Module -Name .\AzureRM.Resources
 
 function ReadFromList($prompt, $options, $displayProperties) 
 {
@@ -45,9 +51,8 @@ function ReadFromList($prompt, $options, $displayProperties)
 
 function SetupAzureAccount() {
     # Prompt user for credentials
-    Write-Host
+    Write-Host "Logging into Azure..."
     Login-AzureRmAccount | Out-Null
-    #Write-Host "Using Azure account '$($account.Id)'"
 }
 
 function SetupRoleDefinition($subId) {
