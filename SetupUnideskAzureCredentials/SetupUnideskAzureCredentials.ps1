@@ -3,6 +3,15 @@
 # This software includes components from Microsoft Azure PowerShell which is licensed under the Apache License, Version 2.0.  Visit  https://github.com/Azure/azure-powershell for additional information.
 # Microsoft Azure PowerShell includes the AutoMapper library ("AutoMapper") which is license under the MIT License.
 
+Param(
+  [string]$clientID = "http://unideskaccess" #if specified, must start with 'http://'
+)
+
+if (-not $clientID.StartsWith("http://", "CurrentCultureIgnoreCase")) 
+{
+	throw "Client ID must begin with 'http://'"
+}
+
 $ErrorActionPreference = "Stop"
 
 Write-Host "Loading required module (AzureRM.Profile)..."
@@ -134,7 +143,7 @@ $SubscriptionId = $selectedSubscription.SubscriptionId
 
 Select-AzureRmSubscription -SubscriptionId $SubscriptionId | Out-Null
 
-$identifierUri = "http://unideskaccess"
+$identifierUri = $clientID
 $servicePrincipalName = "Unidesk ELM Access"
 $roleDefinitionName = "Unidesk Enterprise Layer Manager for subscription " + $SubscriptionId
 $elmVersion = "4.0"
@@ -155,7 +164,7 @@ else {
     Write-Host
     Write-Host "You have already set up your Client Secret."
     Write-Host "If you wish to change your Client Secret, please follow these instructions at the Unidesk Support Center:"
-    Write-Host "[TODO: PUT LINK HERE]"
+    Write-Host "http://www.unidesk.com/support/learn/for_Azure/app_layers/connector_config#Client_ID_and_Client_Secret"
 }
 
 $existingRoleAssignment = Get-AzureRmRoleAssignment -ServicePrincipalName $identifierUri -ErrorAction Ignore
@@ -182,8 +191,8 @@ Write-Host
 # SIG # Begin signature block
 # MIIOLQYJKoZIhvcNAQcCoIIOHjCCDhoCAQExCzAJBgUrDgMCGgUAMGkGCisGAQQB
 # gjcCAQSgWzBZMDQGCisGAQQBgjcCAR4wJgIDAQAABBAfzDtgWUsITrck0sYpfvNR
-# AgEAAgEAAgEAAgEAAgEAMCEwCQYFKw4DAhoFAAQUykh+Tj8zvVnqK0fkeZtfuPaz
-# wzmgggssMIIFGjCCBAKgAwIBAgIQWZnH6hKnLLp8qq7uxT0DAjANBgkqhkiG9w0B
+# AgEAAgEAAgEAAgEAAgEAMCEwCQYFKw4DAhoFAAQUMpjJWQuRJCdS/vRcA45ZjtxF
+# OsegggssMIIFGjCCBAKgAwIBAgIQWZnH6hKnLLp8qq7uxT0DAjANBgkqhkiG9w0B
 # AQUFADCBtDELMAkGA1UEBhMCVVMxFzAVBgNVBAoTDlZlcmlTaWduLCBJbmMuMR8w
 # HQYDVQQLExZWZXJpU2lnbiBUcnVzdCBOZXR3b3JrMTswOQYDVQQLEzJUZXJtcyBv
 # ZiB1c2UgYXQgaHR0cHM6Ly93d3cudmVyaXNpZ24uY29tL3JwYSAoYykxMDEuMCwG
@@ -249,11 +258,11 @@ Write-Host
 # EyVWZXJpU2lnbiBDbGFzcyAzIENvZGUgU2lnbmluZyAyMDEwIENBAhBZmcfqEqcs
 # unyqru7FPQMCMAkGBSsOAwIaBQCgeDAYBgorBgEEAYI3AgEMMQowCKACgAChAoAA
 # MBkGCSqGSIb3DQEJAzEMBgorBgEEAYI3AgEEMBwGCisGAQQBgjcCAQsxDjAMBgor
-# BgEEAYI3AgEVMCMGCSqGSIb3DQEJBDEWBBT/cu8FuCGsH5ZJ8U5tg2TgseQY3zAN
-# BgkqhkiG9w0BAQEFAASCAQBBnVObsMc2L2muKDuFzCwt+G5uUr6e6zdOi9lhjpN1
-# vzcO4JWaEdaZ9YC6ZePpw9J7L6SO+aJau/n+mbmR3SNryNOe4r4iitQ7iZPtFMvB
-# QD5rhRaQcR3M5/eiiT+v2f+vbnvOhGCBGx+I7y0jHw2vlvE/zp9j2+H+0iBJoxcE
-# 2+ytn3z3qUI3iSVqWyzNWf5wWla2DT1cHRsK1SOxMQqo8pt/ZM+1TGp6t9KM0N3n
-# H3WTqrOsiPb3+zYciSZ0rO+p9hve2Q/pdn73OCv+X8C3LKh2RXtBTOIwT5AURtLj
-# e2Fcfbg3+BjVMsv69FyO2MPWa5AdQgx+1q91KudZjVG0
+# BgEEAYI3AgEVMCMGCSqGSIb3DQEJBDEWBBT9JEoxCf6usG1s8Lz9fF6oBl8nhDAN
+# BgkqhkiG9w0BAQEFAASCAQBToBOGT0VQW/Z3uV44XW5xUMngWum4+PnpPecVl2qP
+# Y2vG062AAR7M3OfSI8FkhRSjIvv2mDqZztIekNfeTKfKpFNfw+RVniXttcwoqyzS
+# LmmLlB6zVHF/qS7Z0cn23Gqf4vDpjMu7myLvV5htsqg7xAvaC/vFC+i6pnjOZKDH
+# jjp+RfqqsE+bnBdqiUGJcaizDRLHIGEPhVS3makRKf9cbrr4j8lInC4Oo88wx7Ju
+# Ga+Lr2I69zH/Q+OGsy/YYhXhoq33XEEHCATdcrKPFoE1Bw4tkDEQvDWD650xkxvY
+# ABSsCqepe/XyodeX9o2rVC6CJJosQ3pWrn54cBFDAZU7
 # SIG # End signature block
