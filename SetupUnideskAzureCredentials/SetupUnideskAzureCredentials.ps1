@@ -4,16 +4,14 @@
 # Microsoft Azure PowerShell includes the AutoMapper library ("AutoMapper") which is license under the MIT License.
 
 Param(
-  [string]$clientID = "http://unideskaccess" #if specified, must start with 'http://'
+    # Parameters are for developer use only
+    [string]$clientIdPrefix = "unideskaccess", 
+    [switch]$noLogin
 )
-
-if (-not $clientID.StartsWith("http://", "CurrentCultureIgnoreCase")) 
-{
-	throw "Client ID must begin with 'http://'"
-}
 
 $ErrorActionPreference = "Stop"
 
+Write-Host
 Write-Host "Loading required module (AzureRM.Profile)..."
 
 Import-Module -Name .\AzureRM.Profile
@@ -24,6 +22,7 @@ Import-Module -Name .\AzureRM.Resources
 
 function ReadFromList($prompt, $options, $displayProperties) 
 {
+    Write-Host
     Write-Host "---------------------------------------------"
     Write-Host
     Write-Host $prompt
@@ -44,16 +43,11 @@ function ReadFromList($prompt, $options, $displayProperties)
     }
     $options | Select $displayProperties | Format-Table -AutoSize | Out-Host
 
-    if ($displayProperties -eq $null) {
-        Write-Host
-    }
-
     do {
         $selection = Read-Host "Enter the number of your selection"
         $selectionIndex = ($selection -as [int]) - 1
     } while ($selectionIndex -lt 0 -or $selectionIndex -ge $optionList.Length)
 
-    Write-Host
     return $options[$selectionIndex]
 }
 
@@ -63,54 +57,16 @@ function SetupAzureAccount() {
     Login-AzureRmAccount | Out-Null
 }
 
-function SetupRoleDefinition($subId) {
-    $roleDef = Get-AzureRmRoleDefinition -Name $roleDefinitionName
-
-    if ($roleDef -eq $null) {
-        $roleDef = New-Object Microsoft.Azure.Commands.Resources.Models.Authorization.PSRoleDefinition
-        $roleDef.Name = $roleDefinitionName
-    }
-
-    $roleDef.Actions = @(
-        "Microsoft.Compute/virtualMachines/delete",
-        "Microsoft.Compute/virtualMachines/read",
-        "Microsoft.Compute/virtualMachines/*/read",
-        "Microsoft.Compute/virtualMachines/*/action",
-        "Microsoft.Compute/locations/vmSizes/read",
-        "Microsoft.Storage/storageAccounts/read",
-        "Microsoft.Storage/storageAccounts/listKeys/action",
-        "Microsoft.Network/virtualNetworks/read",
-        "Microsoft.Network/virtualNetworks/*/read",
-        "Microsoft.Network/networkInterfaces/delete",
-        "Microsoft.Resources/subscriptions/resourceGroups/*",
-        "Microsoft.Resources/deployments/*"
-        )
-    $roleDef.Description = "For use by a Unidesk " + $elmVersion + " Enterprise Layer Manager only."
-
-    $scope = "/subscriptions/" + $subId
-    if ($roleDef.AssignableScopes -eq $null) {
-        $roleDef.AssignableScopes = @($scope)
-    } else {
-        if (-not $roleDef.AssignableScopes.Contains($scope)) {
-            $roleDef.AssignableScopes.Add($scope)
-        }
-    }
-
-    if ($roleDef.Id -eq $null) {
-        return New-AzureRmRoleDefinition -Role $roleDef
-    } else {
-        return Set-AzureRmRoleDefinition -Role $roleDef
-    }
-}
-
 function GetPlainTextPassword() {
-    $passwordMinLength = 12
+    $passwordMinLength = 16
     
     Write-Host "---------------------------------------------"
     Write-Host
     Write-Host "Enter a Client Secret for your Unidesk ELM credentials, at least" $passwordMinLength "characters long."
+    Write-Host
+    Write-Host "!!! KEEP THIS SECRET SAFE! It can be used to access to your Azure subscription."
 
-    $passwordPrompt = "-->REMEMBER AND SAFEGUARD THIS VALUE, it will never be displayed again and will be needed to set up Unidesk!<--"
+    $passwordPrompt = "!!! REMEMBER THIS VALUE, it will never be displayed again and will be needed to set up Unidesk."
     do {
         Write-Host
         Write-Host $passwordPrompt
@@ -134,7 +90,9 @@ function GetPlainTextPassword() {
     return $plainPassword
 }
 
-SetupAzureAccount
+if (-not $noLogin) {
+    SetupAzureAccount
+}
 
 # Pick subscription
 $subscriptions = Get-AzureRmSubscription
@@ -143,40 +101,69 @@ $SubscriptionId = $selectedSubscription.SubscriptionId
 
 Select-AzureRmSubscription -SubscriptionId $SubscriptionId | Out-Null
 
-$identifierUri = $clientID
-$servicePrincipalName = "Unidesk ELM Access"
-$roleDefinitionName = "Unidesk Enterprise Layer Manager for subscription " + $SubscriptionId
+$identifierUri = "http://" + $clientIdPrefix + "-" + $SubscriptionId
+$applicationDisplayName = "Unidesk ELM Access for " + $selectedSubscription.SubscriptionName
+
+if ($clientIdPrefix -ne "unideskaccess") {
+    $applicationDisplayName = $applicationDisplayName + " (" + $clientIdPrefix + ")"
+}
+
 $elmVersion = "4.0"
-$roleDefinition = SetupRoleDefinition $SubscriptionId
+
+$alreadySetup = $false
 
 $existingServicePrincipal = Get-AzureRmADServicePrincipal -ServicePrincipalName $identifierUri
 if ($existingServicePrincipal -eq $null) {
     $password = GetPlainTextPassword
-    $adApp = New-AzureRmADApplication -DisplayName "Unidesk ELM Access" -HomePage "http://unused" -IdentifierUris $identifierUri -Password $password
+    $adApp = New-AzureRmADApplication -DisplayName $applicationDisplayName -HomePage "http://unused" -IdentifierUris $identifierUri -Password $password
     $adServicePrincipal = New-AzureRmADServicePrincipal -ApplicationId $adApp.ApplicationId
-    
-    # Give Azure a moment to set up the service principal
-    Write-Host
-    Write-Host "Setting up Azure Active Directory application..."
-    Sleep 10
 }
 else {
-    Write-Host
-    Write-Host "You have already set up your Client Secret."
-    Write-Host "If you wish to change your Client Secret, please follow these instructions at the Unidesk Support Center:"
-    Write-Host "http://www.unidesk.com/support/learn/for_Azure/app_layers/connector_config#Client_ID_and_Client_Secret"
+    $alreadySetup = $true
 }
 
-$existingRoleAssignment = Get-AzureRmRoleAssignment -ServicePrincipalName $identifierUri -ErrorAction Ignore
+$roleDefinitionName = "Contributor"
+
+$existingRoleAssignment = Get-AzureRmRoleAssignment -ServicePrincipalName $identifierUri -RoleDefinitionName $roleDefinitionName -ErrorAction Ignore
 if ($existingRoleAssignment -eq $null) {
-    $roleAssignment = New-AzureRmRoleAssignment -ServicePrincipalName $identifierUri -RoleDefinitionName $roleDefinitionName
     Write-Host
-    Write-Host "Unidesk credentials have been assigned to subscription:" $selectedSubscription.SubscriptionName
+    Write-Host "Creating role assignment..."
+    Sleep 5
+
+    $completed = $false
+    $retries = 6;
+    
+    While (-not $completed) {
+        Try {
+            $roleAssignment = New-AzureRmRoleAssignment -ServicePrincipalName $identifierUri -RoleDefinitionName $roleDefinitionName -ErrorAction Continue
+            $completed = $true
+        }
+        Catch {
+            $retries--
+            if ($retries -ge 0 -and $_.Exception[0].Error.Code -eq "PrincipalNotFound") {
+                Write-Host "Waiting for the service principal to finish creating..."
+                Sleep 5
+            } else {
+                Throw $_
+            }
+        }
+    }
 }
 
 Write-Host
 Write-Host "---------------------------------------------"
-Write-Host "Your Unidesk credentials have been set up successfully. Enter these values into the connector configuration page:"
+Write-Host
+
+if ($alreadySetup) {
+    Write-Host "You have already set up your Client Secret for this subscription."
+    Write-Host "If you wish to change your Client Secret, please follow these instructions at the Unidesk Support Center:"
+    Write-Host "  http://www.unidesk.com/support/learn/for_Azure/app_layers/connector_config#Client_ID_and_Client_Secret"
+} else {
+    Write-Host "Your Unidesk credentials have been set up successfully."
+}
+
+Write-Host
+Write-Host "Enter these values into the connector configuration page:"
 Write-Host
 Write-Host "Subscription ID: " $SubscriptionId
 Write-Host "Tenant ID:       " $selectedSubscription.TenantId
@@ -185,14 +172,14 @@ Write-Host "Client Secret:    ********"
 Write-Host "Storage Account:  [Use the name of a storage account you wish to deploy to.]"
 Write-Host 
 Write-Host "Manage your storage accounts in the Azure portal here:"
-Write-Host "https://portal.azure.com/#blade/HubsExtension/BrowseResourceBlade/resourceType/Microsoft.Storage%2FStorageAccounts/scope/"
+Write-Host "  https://portal.azure.com/#blade/HubsExtension/BrowseResourceBlade/resourceType/Microsoft.Storage%2FStorageAccounts/scope/"
 Write-Host
 
 # SIG # Begin signature block
 # MIIOLQYJKoZIhvcNAQcCoIIOHjCCDhoCAQExCzAJBgUrDgMCGgUAMGkGCisGAQQB
 # gjcCAQSgWzBZMDQGCisGAQQBgjcCAR4wJgIDAQAABBAfzDtgWUsITrck0sYpfvNR
-# AgEAAgEAAgEAAgEAAgEAMCEwCQYFKw4DAhoFAAQUMpjJWQuRJCdS/vRcA45ZjtxF
-# OsegggssMIIFGjCCBAKgAwIBAgIQWZnH6hKnLLp8qq7uxT0DAjANBgkqhkiG9w0B
+# AgEAAgEAAgEAAgEAAgEAMCEwCQYFKw4DAhoFAAQU8BZ/2+0EwkML8R5ensOjrgxv
+# 1TegggssMIIFGjCCBAKgAwIBAgIQWZnH6hKnLLp8qq7uxT0DAjANBgkqhkiG9w0B
 # AQUFADCBtDELMAkGA1UEBhMCVVMxFzAVBgNVBAoTDlZlcmlTaWduLCBJbmMuMR8w
 # HQYDVQQLExZWZXJpU2lnbiBUcnVzdCBOZXR3b3JrMTswOQYDVQQLEzJUZXJtcyBv
 # ZiB1c2UgYXQgaHR0cHM6Ly93d3cudmVyaXNpZ24uY29tL3JwYSAoYykxMDEuMCwG
@@ -258,11 +245,11 @@ Write-Host
 # EyVWZXJpU2lnbiBDbGFzcyAzIENvZGUgU2lnbmluZyAyMDEwIENBAhBZmcfqEqcs
 # unyqru7FPQMCMAkGBSsOAwIaBQCgeDAYBgorBgEEAYI3AgEMMQowCKACgAChAoAA
 # MBkGCSqGSIb3DQEJAzEMBgorBgEEAYI3AgEEMBwGCisGAQQBgjcCAQsxDjAMBgor
-# BgEEAYI3AgEVMCMGCSqGSIb3DQEJBDEWBBT9JEoxCf6usG1s8Lz9fF6oBl8nhDAN
-# BgkqhkiG9w0BAQEFAASCAQBToBOGT0VQW/Z3uV44XW5xUMngWum4+PnpPecVl2qP
-# Y2vG062AAR7M3OfSI8FkhRSjIvv2mDqZztIekNfeTKfKpFNfw+RVniXttcwoqyzS
-# LmmLlB6zVHF/qS7Z0cn23Gqf4vDpjMu7myLvV5htsqg7xAvaC/vFC+i6pnjOZKDH
-# jjp+RfqqsE+bnBdqiUGJcaizDRLHIGEPhVS3makRKf9cbrr4j8lInC4Oo88wx7Ju
-# Ga+Lr2I69zH/Q+OGsy/YYhXhoq33XEEHCATdcrKPFoE1Bw4tkDEQvDWD650xkxvY
-# ABSsCqepe/XyodeX9o2rVC6CJJosQ3pWrn54cBFDAZU7
+# BgEEAYI3AgEVMCMGCSqGSIb3DQEJBDEWBBTZLum05+TzzX6GfNgjkibdAsRzbjAN
+# BgkqhkiG9w0BAQEFAASCAQBp5VdDdt+iHyatreFvQmQPMfGiVDoGreNNJnp/QtSB
+# uy+NrMKoOsQ1wz8UnUsDJ6coXd0AsJZPJN1opjRBzwhrdNd122aZw7CvKFYvEhcu
+# md7Szuyx4VQspOMNJKrwuylXC9n0nZG/mk3AQiHlVuT2Yh6+loOcYqNYWTjtOJat
+# TTvLZqc7ZUX7StZqxqmCJyLPaw9CwRR7Y0u0Es/Fj9uyOqhTzj9okg+Obs6N/9wd
+# DWhUCDkBugudTj3JNsuFWHp7h1XUprokx4FdsOw3bDlemCSfc7yOACKrVxya3PP2
+# gEucg2yE08RMXLx1g7IYPdYk0qYfJdIyY2JV7sKOqw1g
 # SIG # End signature block
