@@ -110,41 +110,71 @@ if ($clientIdPrefix -ne "unideskaccess") {
 
 $elmVersion = "4.0"
 
-$alreadySetup = $false
-
-$existingServicePrincipal = Get-AzureRmADServicePrincipal -ServicePrincipalName $identifierUri
-if ($existingServicePrincipal -eq $null) {
-    $password = GetPlainTextPassword
-    $adApp = New-AzureRmADApplication -DisplayName $applicationDisplayName -HomePage "http://unused" -IdentifierUris $identifierUri -Password $password
-    $adServicePrincipal = New-AzureRmADServicePrincipal -ApplicationId $adApp.ApplicationId
-}
-else {
-    $alreadySetup = $true
-}
-
 $roleDefinitionName = "Contributor"
 
-$existingRoleAssignment = Get-AzureRmRoleAssignment -ServicePrincipalName $identifierUri -RoleDefinitionName $roleDefinitionName -ErrorAction Ignore
-if ($existingRoleAssignment -eq $null) {
-    Write-Host
-    Write-Host "Creating role assignment..."
-    Sleep 5
+$alreadySetup = $false
 
-    $completed = $false
-    $retries = 6;
-    
-    While (-not $completed) {
-        Try {
-            $roleAssignment = New-AzureRmRoleAssignment -ServicePrincipalName $identifierUri -RoleDefinitionName $roleDefinitionName -ErrorAction Continue
-            $completed = $true
+Try {
+    $existingServicePrincipal = Get-AzureRmADServicePrincipal -ServicePrincipalName $identifierUri -ErrorAction Stop
+    if ($existingServicePrincipal -eq $null) {
+
+        # This will throw if the account does not have the correct authorization
+        Get-AzureRmADServicePrincipal | Out-Null
+
+        $password = GetPlainTextPassword
+        $adApp = New-AzureRmADApplication -DisplayName $applicationDisplayName -HomePage "http://unused" -IdentifierUris $identifierUri -Password $password
+        $adServicePrincipal = New-AzureRmADServicePrincipal -ApplicationId $adApp.ApplicationId
+    }
+    else {
+        $alreadySetup = $true
+    }
+}
+Catch {
+    if ($_.Exception[0].Error.OriginalMessage.Contains("Authorization_RequestDenied")) {
+        Write-Host
+        Write-Host "Checking if credentials have already been configured for this subscription..."
+        $existingRoleAssignment = Get-AzureRmRoleAssignment -RoleDefinitionName $roleDefinitionName | Where DisplayName -EQ $applicationDisplayName
+        if ($existingRoleAssignment -eq $null) {
+            Write-Host
+            Write-Host "ERROR: This Azure account does not have the required Azure Active Directory authorization needed to setup credentials for Unidesk."
+            Write-Host "Please contact your primary Azure administrator and ask them to run this tool."
+            Write-Host
+            Return
         }
-        Catch {
-            $retries--
-            if ($retries -ge 0 -and $_.Exception[0].Error.Code -eq "PrincipalNotFound") {
-                Write-Host "Waiting for the service principal to finish creating..."
-                Sleep 5
-            } else {
-                Throw $_
+        if ($existingRoleAssignment.Length -gt 1) {
+            Write-Host
+            Write-Host "ERROR: found multiple role assignments with the name'" $applicationDisplayName "', will exit with original error."
+            Throw $_
+        }
+        $alreadySetup = $true
+    } else {
+        Throw $_
+    }
+}
+
+if ($existingRoleAssignment -eq $null) {
+    $existingRoleAssignment = Get-AzureRmRoleAssignment -ServicePrincipalName $identifierUri -RoleDefinitionName $roleDefinitionName -ErrorAction Ignore
+    if ($existingRoleAssignment -eq $null) {
+        Write-Host
+        Write-Host "Creating role assignment..."
+        Sleep 5
+
+        $completed = $false
+        $retries = 6;
+    
+        While (-not $completed) {
+            Try {
+                $roleAssignment = New-AzureRmRoleAssignment -ServicePrincipalName $identifierUri -RoleDefinitionName $roleDefinitionName -ErrorAction Continue
+                $completed = $true
+            }
+            Catch {
+                $retries--
+                if ($retries -ge 0 -and $_.Exception[0].Error.Code -eq "PrincipalNotFound") {
+                    Write-Host "Waiting for the service principal to finish creating..."
+                    Sleep 5
+                } else {
+                    Throw $_
+                }
             }
         }
     }
@@ -178,8 +208,8 @@ Write-Host
 # SIG # Begin signature block
 # MIIOLQYJKoZIhvcNAQcCoIIOHjCCDhoCAQExCzAJBgUrDgMCGgUAMGkGCisGAQQB
 # gjcCAQSgWzBZMDQGCisGAQQBgjcCAR4wJgIDAQAABBAfzDtgWUsITrck0sYpfvNR
-# AgEAAgEAAgEAAgEAAgEAMCEwCQYFKw4DAhoFAAQU8BZ/2+0EwkML8R5ensOjrgxv
-# 1TegggssMIIFGjCCBAKgAwIBAgIQWZnH6hKnLLp8qq7uxT0DAjANBgkqhkiG9w0B
+# AgEAAgEAAgEAAgEAAgEAMCEwCQYFKw4DAhoFAAQUd5KZs5FLrL+4mVfBD+cjtO76
+# nRmgggssMIIFGjCCBAKgAwIBAgIQWZnH6hKnLLp8qq7uxT0DAjANBgkqhkiG9w0B
 # AQUFADCBtDELMAkGA1UEBhMCVVMxFzAVBgNVBAoTDlZlcmlTaWduLCBJbmMuMR8w
 # HQYDVQQLExZWZXJpU2lnbiBUcnVzdCBOZXR3b3JrMTswOQYDVQQLEzJUZXJtcyBv
 # ZiB1c2UgYXQgaHR0cHM6Ly93d3cudmVyaXNpZ24uY29tL3JwYSAoYykxMDEuMCwG
@@ -245,11 +275,11 @@ Write-Host
 # EyVWZXJpU2lnbiBDbGFzcyAzIENvZGUgU2lnbmluZyAyMDEwIENBAhBZmcfqEqcs
 # unyqru7FPQMCMAkGBSsOAwIaBQCgeDAYBgorBgEEAYI3AgEMMQowCKACgAChAoAA
 # MBkGCSqGSIb3DQEJAzEMBgorBgEEAYI3AgEEMBwGCisGAQQBgjcCAQsxDjAMBgor
-# BgEEAYI3AgEVMCMGCSqGSIb3DQEJBDEWBBTZLum05+TzzX6GfNgjkibdAsRzbjAN
-# BgkqhkiG9w0BAQEFAASCAQBp5VdDdt+iHyatreFvQmQPMfGiVDoGreNNJnp/QtSB
-# uy+NrMKoOsQ1wz8UnUsDJ6coXd0AsJZPJN1opjRBzwhrdNd122aZw7CvKFYvEhcu
-# md7Szuyx4VQspOMNJKrwuylXC9n0nZG/mk3AQiHlVuT2Yh6+loOcYqNYWTjtOJat
-# TTvLZqc7ZUX7StZqxqmCJyLPaw9CwRR7Y0u0Es/Fj9uyOqhTzj9okg+Obs6N/9wd
-# DWhUCDkBugudTj3JNsuFWHp7h1XUprokx4FdsOw3bDlemCSfc7yOACKrVxya3PP2
-# gEucg2yE08RMXLx1g7IYPdYk0qYfJdIyY2JV7sKOqw1g
+# BgEEAYI3AgEVMCMGCSqGSIb3DQEJBDEWBBQjSaH54dHWv7PHtqq1F5LfEJ6oVjAN
+# BgkqhkiG9w0BAQEFAASCAQBngW/V9oDstKowllN0d4UkJQEtlOJX3Wpky8PAHCv+
+# Qr6Q+4Dv9XQWfvSIUzWB911ZIW7mRF7y0trcuxI6MK403SO9QUmX6XrXZUn4Fd0w
+# U6FsvW8LFMqXvG7kIFeYvZcTX5i/8HjYaR34ewZXT8hrACTNeT9pGDMPsHyb2Q+L
+# CkZX7pRyW1XcmeKJEwnJBw5e7/EhYXEUU/7qFZ0ByaIXsJE2CCnZvY4GKdc0MG3c
+# LAxhzkuufqV46wTl/+ZsWbqfIiiYsSW4zSK0qNk9tVURfmkAuoR7zfwbB9uLx+vu
+# zT0i1CLALDKrpiTkK8usp7B6V+7DIfCpOHIyc5KrqOCP
 # SIG # End signature block
