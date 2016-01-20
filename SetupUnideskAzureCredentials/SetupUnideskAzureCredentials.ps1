@@ -187,7 +187,7 @@ Write-Host
 if ($alreadySetup) {
     Write-Host "You have already set up your Client Secret for this subscription."
     Write-Host "If you wish to change your Client Secret, please follow these instructions at the Unidesk Support Center:"
-    Write-Host "  http://www.unidesk.com/support/learn/for_Azure/app_layers/connector_config#Client_ID_and_Client_Secret"
+    Write-Host "  http://www.unidesk.com/support/learn/for_Azure/get_started/platform_connectors/platform_connector_azure"
 } else {
     Write-Host "Your Unidesk credentials have been set up successfully."
 }
@@ -205,11 +205,12 @@ Write-Host "Manage your storage accounts in the Azure portal here:"
 Write-Host "  https://portal.azure.com/#blade/HubsExtension/BrowseResourceBlade/resourceType/Microsoft.Storage%2FStorageAccounts/scope/"
 Write-Host
 
+
 # SIG # Begin signature block
 # MIIOLQYJKoZIhvcNAQcCoIIOHjCCDhoCAQExCzAJBgUrDgMCGgUAMGkGCisGAQQB
 # gjcCAQSgWzBZMDQGCisGAQQBgjcCAR4wJgIDAQAABBAfzDtgWUsITrck0sYpfvNR
-# AgEAAgEAAgEAAgEAAgEAMCEwCQYFKw4DAhoFAAQUd5KZs5FLrL+4mVfBD+cjtO76
-# nRmgggssMIIFGjCCBAKgAwIBAgIQWZnH6hKnLLp8qq7uxT0DAjANBgkqhkiG9w0B
+# AgEAAgEAAgEAAgEAAgEAMCEwCQYFKw4DAhoFAAQUGiLSVvpFVQJ7091mXT/ihzet
+# EBWgggssMIIFGjCCBAKgAwIBAgIQWZnH6hKnLLp8qq7uxT0DAjANBgkqhkiG9w0B
 # AQUFADCBtDELMAkGA1UEBhMCVVMxFzAVBgNVBAoTDlZlcmlTaWduLCBJbmMuMR8w
 # HQYDVQQLExZWZXJpU2lnbiBUcnVzdCBOZXR3b3JrMTswOQYDVQQLEzJUZXJtcyBv
 # ZiB1c2UgYXQgaHR0cHM6Ly93d3cudmVyaXNpZ24uY29tL3JwYSAoYykxMDEuMCwG
@@ -275,11 +276,11 @@ Write-Host
 # EyVWZXJpU2lnbiBDbGFzcyAzIENvZGUgU2lnbmluZyAyMDEwIENBAhBZmcfqEqcs
 # unyqru7FPQMCMAkGBSsOAwIaBQCgeDAYBgorBgEEAYI3AgEMMQowCKACgAChAoAA
 # MBkGCSqGSIb3DQEJAzEMBgorBgEEAYI3AgEEMBwGCisGAQQBgjcCAQsxDjAMBgor
-# BgEEAYI3AgEVMCMGCSqGSIb3DQEJBDEWBBQjSaH54dHWv7PHtqq1F5LfEJ6oVjAN
-# BgkqhkiG9w0BAQEFAASCAQBngW/V9oDstKowllN0d4UkJQEtlOJX3Wpky8PAHCv+
-# Qr6Q+4Dv9XQWfvSIUzWB911ZIW7mRF7y0trcuxI6MK403SO9QUmX6XrXZUn4Fd0w
-# U6FsvW8LFMqXvG7kIFeYvZcTX5i/8HjYaR34ewZXT8hrACTNeT9pGDMPsHyb2Q+L
-# CkZX7pRyW1XcmeKJEwnJBw5e7/EhYXEUU/7qFZ0ByaIXsJE2CCnZvY4GKdc0MG3c
-# LAxhzkuufqV46wTl/+ZsWbqfIiiYsSW4zSK0qNk9tVURfmkAuoR7zfwbB9uLx+vu
-# zT0i1CLALDKrpiTkK8usp7B6V+7DIfCpOHIyc5KrqOCP
+# BgEEAYI3AgEVMCMGCSqGSIb3DQEJBDEWBBTOHEV0NSFsikKmLHGta9XYSr428jAN
+# BgkqhkiG9w0BAQEFAASCAQBl/ckD2BoJTKaywOZSsLKax9iWKlJspgRX4LILu2o2
+# w4ePZkup/MIO904MdPaeQnLy0suFq4vj7q1me/DWTB21qeHF78ReRQFXfpgk0cQT
+# H0MY5PAq13HaFrMuvBPJpxt4AR2OnGAPrXWm8OSy8JdaAhfyVE3bV3yNndE/tyga
+# KF+IInl9inM24r/kdxFEd3C5pKsJZyIVBztx4EqKKJMhnR2MESGeaVN+qffDm5fE
+# Zld038/DuTNcK9MSytiFjvkDWR5suRsEIS/DjxrXWlcI5pPPZZ/BT7sq84xyGh+M
+# Fb6+a+OuXPquQjNSpZ9kgmcVY6iyeAhdJbfM7C5M6CNl
 # SIG # End signature block
