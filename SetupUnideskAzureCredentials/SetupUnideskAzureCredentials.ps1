@@ -121,6 +121,7 @@ Try {
         # This will throw if the account does not have the correct authorization
         Get-AzureRmADServicePrincipal | Out-Null
 
+        New-AzureRmADApplication -P
         $password = GetPlainTextPassword
         $adApp = New-AzureRmADApplication -DisplayName $applicationDisplayName -HomePage "http://unused" -IdentifierUris $identifierUri -Password $password
         $adServicePrincipal = New-AzureRmADServicePrincipal -ApplicationId $adApp.ApplicationId
@@ -184,10 +185,12 @@ Write-Host
 Write-Host "---------------------------------------------"
 Write-Host
 
+$supportUrl = "http://www.unidesk.com/support/learn/for_Azure/get_started/platform_connectors/platform_connector_azure#Secret"
+
 if ($alreadySetup) {
     Write-Host "You have already set up your Client Secret for this subscription."
     Write-Host "If you wish to change your Client Secret, please follow these instructions at the Unidesk Support Center:"
-    Write-Host "  http://www.unidesk.com/support/learn/for_Azure/get_started/platform_connectors/platform_connector_azure"
+    Write-Host "  $supportUrl"
 } else {
     Write-Host "Your Unidesk credentials have been set up successfully."
 }
@@ -205,12 +208,46 @@ Write-Host "Manage your storage accounts in the Azure portal here:"
 Write-Host "  https://portal.azure.com/#blade/HubsExtension/BrowseResourceBlade/resourceType/Microsoft.Storage%2FStorageAccounts/scope/"
 Write-Host
 
+Try {
+    $outputFileLocation = (Get-Location).Path + "\" + "Platform Config for " + $selectedSubscription.SubscriptionName + ".txt"
+
+    $subName = $selectedSubscription.SubscriptionName
+    $tenantId = $selectedSubscription.TenantId
+
+    $fileOutput = @("",
+        "Unidesk Azure Platform Connector Configuration for subscription: $subName",
+        "",
+        "Enter these values into the connector configuration page:",
+        "Subscription ID:  $SubscriptionId",
+        "Tenant ID:        $tenantId",
+        "Client ID:        $identifierUri",
+        "Client Secret:    ********",
+        "Storage Account:  [Use the name of a storage account you wish to deploy to.]",
+        "",
+        "Manage your storage accounts in the Azure portal here:",
+        "  https://portal.azure.com/#blade/HubsExtension/BrowseResourceBlade/resourceType/Microsoft.Storage%2FStorageAccounts/scope/",
+        "",
+        "If have forgotten your Client Secret, you can change it by following these instructions at the Unidesk Support Center:",
+        "  $supportUrl")
+
+    $fileOutput | Out-File -FilePath $outputFileLocation -Force
+
+    Write-Host
+    Write-Host "***** This information has been saved for future use at: " $outputFileLocation
+    Write-Host
+    Write-Host
+}
+Catch {
+    Write-Host "Failed to create file containing configuration information. Your configuration has still been set up correctly."
+    Write-Host
+}
+
 
 # SIG # Begin signature block
 # MIIOLQYJKoZIhvcNAQcCoIIOHjCCDhoCAQExCzAJBgUrDgMCGgUAMGkGCisGAQQB
 # gjcCAQSgWzBZMDQGCisGAQQBgjcCAR4wJgIDAQAABBAfzDtgWUsITrck0sYpfvNR
-# AgEAAgEAAgEAAgEAAgEAMCEwCQYFKw4DAhoFAAQUGiLSVvpFVQJ7091mXT/ihzet
-# EBWgggssMIIFGjCCBAKgAwIBAgIQWZnH6hKnLLp8qq7uxT0DAjANBgkqhkiG9w0B
+# AgEAAgEAAgEAAgEAAgEAMCEwCQYFKw4DAhoFAAQUHGaRLyRXkABo1J0FtSnDNuc1
+# obqgggssMIIFGjCCBAKgAwIBAgIQWZnH6hKnLLp8qq7uxT0DAjANBgkqhkiG9w0B
 # AQUFADCBtDELMAkGA1UEBhMCVVMxFzAVBgNVBAoTDlZlcmlTaWduLCBJbmMuMR8w
 # HQYDVQQLExZWZXJpU2lnbiBUcnVzdCBOZXR3b3JrMTswOQYDVQQLEzJUZXJtcyBv
 # ZiB1c2UgYXQgaHR0cHM6Ly93d3cudmVyaXNpZ24uY29tL3JwYSAoYykxMDEuMCwG
@@ -276,11 +313,11 @@ Write-Host
 # EyVWZXJpU2lnbiBDbGFzcyAzIENvZGUgU2lnbmluZyAyMDEwIENBAhBZmcfqEqcs
 # unyqru7FPQMCMAkGBSsOAwIaBQCgeDAYBgorBgEEAYI3AgEMMQowCKACgAChAoAA
 # MBkGCSqGSIb3DQEJAzEMBgorBgEEAYI3AgEEMBwGCisGAQQBgjcCAQsxDjAMBgor
-# BgEEAYI3AgEVMCMGCSqGSIb3DQEJBDEWBBTOHEV0NSFsikKmLHGta9XYSr428jAN
-# BgkqhkiG9w0BAQEFAASCAQBl/ckD2BoJTKaywOZSsLKax9iWKlJspgRX4LILu2o2
-# w4ePZkup/MIO904MdPaeQnLy0suFq4vj7q1me/DWTB21qeHF78ReRQFXfpgk0cQT
-# H0MY5PAq13HaFrMuvBPJpxt4AR2OnGAPrXWm8OSy8JdaAhfyVE3bV3yNndE/tyga
-# KF+IInl9inM24r/kdxFEd3C5pKsJZyIVBztx4EqKKJMhnR2MESGeaVN+qffDm5fE
-# Zld038/DuTNcK9MSytiFjvkDWR5suRsEIS/DjxrXWlcI5pPPZZ/BT7sq84xyGh+M
-# Fb6+a+OuXPquQjNSpZ9kgmcVY6iyeAhdJbfM7C5M6CNl
+# BgEEAYI3AgEVMCMGCSqGSIb3DQEJBDEWBBQc29a2yaYnfeLv7iH15VELC14xDjAN
+# BgkqhkiG9w0BAQEFAASCAQBAUKJF0JjAHU+JOQQoq/krQ24TUtdB1afrwhfkpu/6
+# W3Dfm7sv9L2X4Ah/MQVFX/3ShHs+xdR4XQcuQMeIoaQs6Kn+ce2xZh7J9ZeVHgJb
+# d4c1hx+8ZNgMmQfFk0AYXCSzrqToMlIKYbyiIfK5XeDi+bwUVe+XTvaCxrH9W9iQ
+# w2F7Ie47FrXuu4jMvuRacy+rkLWR3TyMafpOpm9VTIYV9lF/HoVb7FvZi5oh9nQy
+# BebgzNjbwx84EyD1/nftDWbjEs5B2stc6IInVK27faAoGf8m2S6XXTAvwtbG5XA7
+# cemRQzlEhSNN+fiOeEmWrET3Ukt8L3Dy0jhyqWvxfTov
 # SIG # End signature block
