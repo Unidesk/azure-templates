@@ -121,7 +121,6 @@ Try {
         # This will throw if the account does not have the correct authorization
         Get-AzureRmADServicePrincipal | Out-Null
 
-        New-AzureRmADApplication -P
         $password = GetPlainTextPassword
         $adApp = New-AzureRmADApplication -DisplayName $applicationDisplayName -HomePage "http://unused" -IdentifierUris $identifierUri -Password $password
         $adServicePrincipal = New-AzureRmADServicePrincipal -ApplicationId $adApp.ApplicationId
