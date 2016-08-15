@@ -1,4 +1,4 @@
-﻿# Copyright (c) 2015 Unidesk Corporation
+# Copyright (c) 2016 Unidesk Corporation
 
 # This software includes components from Microsoft Azure PowerShell which is licensed under the Apache License, Version 2.0.  Visit  https://github.com/Azure/azure-powershell for additional information.
 # Microsoft Azure PowerShell includes the AutoMapper library ("AutoMapper") which is license under the MIT License.
@@ -130,7 +130,8 @@ Try {
     }
 }
 Catch {
-    if ($_.Exception[0].Error.OriginalMessage.Contains("Authorization_RequestDenied")) {
+    $origMessage = $_.Exception[0].Error.OriginalMessage
+    if (($origMessage -ne $null) -and ($origMessage.Contains("Authorization_RequestDenied"))) {
         Write-Host
         Write-Host "Checking if credentials have already been configured for this subscription..."
         $existingRoleAssignment = Get-AzureRmRoleAssignment -RoleDefinitionName $roleDefinitionName | Where DisplayName -EQ $applicationDisplayName
@@ -245,8 +246,8 @@ Catch {
 # SIG # Begin signature block
 # MIIOLQYJKoZIhvcNAQcCoIIOHjCCDhoCAQExCzAJBgUrDgMCGgUAMGkGCisGAQQB
 # gjcCAQSgWzBZMDQGCisGAQQBgjcCAR4wJgIDAQAABBAfzDtgWUsITrck0sYpfvNR
-# AgEAAgEAAgEAAgEAAgEAMCEwCQYFKw4DAhoFAAQUHGaRLyRXkABo1J0FtSnDNuc1
-# obqgggssMIIFGjCCBAKgAwIBAgIQWZnH6hKnLLp8qq7uxT0DAjANBgkqhkiG9w0B
+# AgEAAgEAAgEAAgEAAgEAMCEwCQYFKw4DAhoFAAQUCm7SbvQO6xFUPsOsQLRMXnKs
+# OlWgggssMIIFGjCCBAKgAwIBAgIQWZnH6hKnLLp8qq7uxT0DAjANBgkqhkiG9w0B
 # AQUFADCBtDELMAkGA1UEBhMCVVMxFzAVBgNVBAoTDlZlcmlTaWduLCBJbmMuMR8w
 # HQYDVQQLExZWZXJpU2lnbiBUcnVzdCBOZXR3b3JrMTswOQYDVQQLEzJUZXJtcyBv
 # ZiB1c2UgYXQgaHR0cHM6Ly93d3cudmVyaXNpZ24uY29tL3JwYSAoYykxMDEuMCwG
@@ -312,11 +313,11 @@ Catch {
 # EyVWZXJpU2lnbiBDbGFzcyAzIENvZGUgU2lnbmluZyAyMDEwIENBAhBZmcfqEqcs
 # unyqru7FPQMCMAkGBSsOAwIaBQCgeDAYBgorBgEEAYI3AgEMMQowCKACgAChAoAA
 # MBkGCSqGSIb3DQEJAzEMBgorBgEEAYI3AgEEMBwGCisGAQQBgjcCAQsxDjAMBgor
-# BgEEAYI3AgEVMCMGCSqGSIb3DQEJBDEWBBQc29a2yaYnfeLv7iH15VELC14xDjAN
-# BgkqhkiG9w0BAQEFAASCAQBAUKJF0JjAHU+JOQQoq/krQ24TUtdB1afrwhfkpu/6
-# W3Dfm7sv9L2X4Ah/MQVFX/3ShHs+xdR4XQcuQMeIoaQs6Kn+ce2xZh7J9ZeVHgJb
-# d4c1hx+8ZNgMmQfFk0AYXCSzrqToMlIKYbyiIfK5XeDi+bwUVe+XTvaCxrH9W9iQ
-# w2F7Ie47FrXuu4jMvuRacy+rkLWR3TyMafpOpm9VTIYV9lF/HoVb7FvZi5oh9nQy
-# BebgzNjbwx84EyD1/nftDWbjEs5B2stc6IInVK27faAoGf8m2S6XXTAvwtbG5XA7
-# cemRQzlEhSNN+fiOeEmWrET3Ukt8L3Dy0jhyqWvxfTov
+# BgEEAYI3AgEVMCMGCSqGSIb3DQEJBDEWBBQzILPbxiYbHiYUrGWQud3aVasiozAN
+# BgkqhkiG9w0BAQEFAASCAQAmqwPapk8RXjo2GFesJzDGD08fEaZWTl3MfrgZIVpN
+# 3d9GL6Pfbp49gdbcPBYxNMoezU5snnXmdJU90lYExt++AZ/QSYEuECt6ZfQtEUyd
+# v1ykN6gtBdUtIyivw3OiIgOX2FTSKvpIly7sJy1yvi2cMi2Uqoxo/lBWU8AYe9/n
+# IQFqXC3zk1LBLk9igF+Ki2V7QZWYct0F4qU6dZBh1Q3DqgiGba/CW2keguyIk6BX
+# sS96cYN+7wmCsQjICZj1xlWb1+GJ+vAl3Mj3Al1w+EwEszc0j7eSTrOocjiziAi/
+# FnWY8Uhogqp7UxNJwNVA4QLruGeRAzB3GKEimgKZRlbf
 # SIG # End signature block
